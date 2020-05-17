@@ -1,0 +1,1 @@
+INSERT INTO item_prices_surplus_store SET ?
