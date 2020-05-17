@@ -3,20 +3,20 @@ const cheerio = require('cheerio')
 
 const getItemPrice = async (productUrl) => {
     return new Promise(function(resolve, reject) {
-        const patrolBaseUrl = 'https://www.patrolbase.co.uk/'
-        const url = patrolBaseUrl + productUrl
+        const surplusStoreUrl = 'https://www.surplusstore.co.uk/tokyo-marui-resident-evil-lightning-hawk.html'
+        const url = surplusStoreUrl + productUrl
 
-        axios.get(url, productUrl)
+        axios.get(surplusStoreUrl)
         .then(async response => {
             const $ = cheerio.load(response.data)
             const itemDetails = [];
-            $('div.content-block.detail-price span.price-formatted').each(function(i, element) {
+            $('div.product-shop div.price-box span.regular-price span.price').each(function(i, element) {
                 itemDetails.push($(this).text())
             })
-            $('div.content-block.detail-stock-message div.stock-message script').each(function(i, element) {
-                const stock = JSON.parse($(this).html())
-                itemDetails.push(stock.stockMessage.displayName)
+            $('p.availability.in-stock span').each(function(i, element) {
+                itemDetails.push($(this).text())
             })
+            console.log(itemDetails)
             resolve(itemDetails)
         })
         .catch(error => {
@@ -24,6 +24,8 @@ const getItemPrice = async (productUrl) => {
         })  
     })
 }
+
+getItemPrice()
 
 module.exports = {
     getItemPrice
