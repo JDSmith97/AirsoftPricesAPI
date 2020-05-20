@@ -9,27 +9,37 @@ const getDbCreds = async () => {
   return dbCreds
 }
 
-const getItemPricePatrolBase = async (dbCreds) => {
-  const items = await db.getItems(dbCreds)
+const getDbConnection = async (dbCreds) => {
+  const dbConnection = await db.getDbConnection(dbCreds)
+  return dbConnection
+}
+
+// const endDbConnection = async (dbConnection) => {
+//   await db.endDbConnection(dbConnection)
+// }
+
+const getItemPricePatrolBase = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
 
   JSON.parse(items).forEach(async item => {
     if(item.patrolbase_url != null) {
       const price = await patrolBase.getItemPrice(item.patrolbase_url)
-      if(price) {
-        await insertPrice.patrolBase(dbCreds, item.item_id, price)
+      // console.log(item.item_id, price)
+      if(price.length == 3) {
+        await insertPrice.patrolBase(dbConnection, item.item_id, price)
       }
     }
   })
 }
 
-const getItemPriceSurplusStore = async (dbCreds) => {
-  const items = await db.getItems(dbCreds)
+const getItemPriceSurplusStore = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
 
   JSON.parse(items).forEach(async item => {
     if(item.surplusstore_url != null) {
       const price = await surplusStore.getItemPrice(item.surplusstore_url)
-      if(price) {
-        await insertPrice.surplusStore(dbCreds, item.item_id, price)
+      if(price.length == 3) {
+        await insertPrice.surplusStore(dbConnection, item.item_id, price)
       }
     }
   })
@@ -37,8 +47,9 @@ const getItemPriceSurplusStore = async (dbCreds) => {
 
 const getItemPrices = async () => {
   const dbCreds = await getDbCreds()
-  await getItemPricePatrolBase(dbCreds)
-  await getItemPriceSurplusStore(dbCreds)
+  const dbConnection = await getDbConnection(dbCreds)
+  await getItemPricePatrolBase(dbConnection)
+  await getItemPriceSurplusStore(dbConnection)
 }
 
 module.exports = {

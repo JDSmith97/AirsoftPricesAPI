@@ -23,6 +23,7 @@ const getItemPrice = async (productUrl) => {
                 const stock = JSON.parse($(this).html())
                 itemDetails.push(stock.stockMessage.displayName)
             })
+            // console.log(productUrl, itemDetails)
             resolve(itemDetails)
         })
         .catch(error => {
