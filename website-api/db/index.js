@@ -21,9 +21,8 @@ const getItemPrices = async (dbConnection, id) => {
       if (error){
         console.log(error)
       }
-      resolve(JSON.stringify(results))
+      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results)));
     })
-    dbConnection.end()
   })
 }
 
