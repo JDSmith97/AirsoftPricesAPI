@@ -16,15 +16,11 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-// const endDbConnection = async (dbConnection) => {
-//   dbConnection.end()
-// }
-
 const getItems = async (dbConnection) => {
   return new Promise(function(resolve, reject) {
     dbConnection.query('SELECT * FROM items', function (error, results, fields) {
       if (error){
-        reject(error)
+        console.log(error)
       }
       resolve(JSON.stringify(results))
     })
@@ -34,15 +30,15 @@ const getItems = async (dbConnection) => {
 const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, onSale) => {
   const itemDetails = {
     item_id: itemId,
-    item_price: price,
-    item_stock: stockStatus,
-    item_on_sale: onSale
+    patrol_base_price: price,
+    patrol_base_stock: stockStatus,
+    patrol_base_sale: onSale
   }
 
   return new Promise(function(resolve, reject) {
     dbConnection.query(insertPatrolBasePriceSQL, [itemDetails, itemDetails], function ( error, results ) {
       if (error){
-        reject(error)
+        console.log(error)
       }
       // console.log('inserted', itemDetails.item_id, error, results)
     })
@@ -53,17 +49,17 @@ const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, o
 const insertItemsSurplusStore = async (dbConnection, itemId, price, stockStatus, onSale) => {
   const itemDetails = {
     item_id: itemId,
-    item_price: price,
-    item_stock: stockStatus,
-    item_on_sale: onSale
+    surplus_store_price: price,
+    surplus_store_stock: stockStatus,
+    surplus_store_sale: onSale
   }
 
   return new Promise(function(resolve, reject) {
     dbConnection.query(insertSurplusStorePriceSQL, [itemDetails, itemDetails], function ( error, results ) {
       if (error){
-        reject(error)
+        console.log(error)
       }
-      console.log('inserted', itemDetails.item_id, error, results)
+      // console.log('inserted', itemDetails.item_id, error, results)
     })
     resolve()
   })
