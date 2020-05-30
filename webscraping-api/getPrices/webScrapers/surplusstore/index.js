@@ -3,30 +3,37 @@ const cheerio = require('cheerio')
 
 const getItemPrice = async (productUrl) => {
     return new Promise(function(resolve, reject) {
-        const surplusStoreUrl = 'https://www.surplusstore.co.uk/'
+        const surplusStoreUrl = 'https://surplusstore.co.uk/'
         const url = surplusStoreUrl + productUrl
 
         axios.get(url)
         .then(async response => {
             const $ = cheerio.load(response.data)
             const itemDetails = [];
-            $('div.product-shop div.price-box span').each(function(i, element) {
-                const text = $(this).text()
-                const removedSpaces = text.replace(/\s/g, "")
-                const removedNewLines = removedSpaces.replace("\n", "")
-                itemDetails.push(removedNewLines)
+            $('div.product-info-price div.price-box.price-final_price span.price-container span.price').each(function(i, element) {
+                const price = $(this).text()
+                itemDetails.push(price)
             })
-            itemDetails.splice(0,1)
             if(itemDetails.length > 1) {
+                const newPrice = itemDetails[0].replace("£", "")
+                const newPriceFloat = parseFloat(newPrice)
+
+                const oldPrice = itemDetails[1].replace("£", "")
+                const oldPriceFloat = parseFloat(oldPrice)
+
+                const difference = oldPriceFloat - newPriceFloat
+
                 itemDetails.splice(1,2)
                 itemDetails.push(1)
+                itemDetails.push(difference)
             } else {
                 itemDetails.push(0)
+                itemDetails.push(0)
             }
-            $('p.availability.in-stock span').each(function(i, element) {
+            $('div.stock.available span').each(function(i, element) {
                 itemDetails.push($(this).text())
             })
-            if(itemDetails.length < 3) {
+            if(itemDetails.length < 4) {
                 itemDetails.push('Out of Stock')
             }
             resolve(itemDetails)

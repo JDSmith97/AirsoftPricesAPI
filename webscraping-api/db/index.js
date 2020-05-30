@@ -27,12 +27,13 @@ const getItems = async (dbConnection) => {
   })
 }
 
-const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, onSale) => {
+const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
   const itemDetails = {
     item_id: itemId,
     patrol_base_price: price,
     patrol_base_stock: stockStatus,
-    patrol_base_sale: onSale
+    patrol_base_sale: onSale,
+    patrol_base_discount: priceDifference
   }
 
   return new Promise(function(resolve, reject) {
@@ -46,12 +47,13 @@ const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, o
   })
 }
 
-const insertItemsSurplusStore = async (dbConnection, itemId, price, stockStatus, onSale) => {
+const insertItemsSurplusStore = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
   const itemDetails = {
     item_id: itemId,
     surplus_store_price: price,
     surplus_store_stock: stockStatus,
-    surplus_store_sale: onSale
+    surplus_store_sale: onSale,
+    surplus_store_discount: priceDifference
   }
 
   return new Promise(function(resolve, reject) {

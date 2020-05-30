@@ -14,18 +14,14 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-// const endDbConnection = async (dbConnection) => {
-//   await db.endDbConnection(dbConnection)
-// }
-
 const getItemPricePatrolBase = async (dbConnection) => {
   let items = await db.getItems(dbConnection)
 
   JSON.parse(items).forEach(async item => {
     if(item.patrolbase_url != null) {
       const price = await patrolBase.getItemPrice(item.patrolbase_url)
-      // console.log(item.item_id, price)
-      if(price.length == 3) {
+      console.log('Patrol Base', item.item_id, price)
+      if(price.length == 4) {
         await insertPrice.patrolBase(dbConnection, item.item_id, price)
       }
     }
@@ -38,7 +34,8 @@ const getItemPriceSurplusStore = async (dbConnection) => {
   JSON.parse(items).forEach(async item => {
     if(item.surplusstore_url != null) {
       const price = await surplusStore.getItemPrice(item.surplusstore_url)
-      if(price.length == 3) {
+      console.log('Surplus Store', item.item_id, price)
+      if(price.length == 4) {
         await insertPrice.surplusStore(dbConnection, item.item_id, price)
       }
     }
