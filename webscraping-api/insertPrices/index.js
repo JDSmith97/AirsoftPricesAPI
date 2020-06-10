@@ -19,7 +19,37 @@ const surplusStore = async (dbConnection, itemId, items) => {
   await db.insertItemsSurplusStore(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
 }
 
+const redwolfAirsoft = async (dbConnection, itemId, items) => {
+  const price = items[0]
+  const stockStatus = items[3]
+  const onSale = items[1]
+  const priceDifference = items[2]
+
+  await db.insertItemsRedwolfAirsoft(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
+}
+
+const zeroOneAirsoft = async (dbConnection, itemId, items) => {
+  const price = items[0]
+  const stockStatus = items[3]
+  const onSale = items[1]
+  const priceDifference = items[2]
+
+  await db.insertItemsZeroOneAirsoft(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
+}
+
+const airsoftWorld = async (dbConnection, itemId, items) => {
+  const price = items[0]
+  const stockStatus = items[3]
+  const onSale = items[1]
+  const priceDifference = items[2]
+
+  await db.insertItemsAirsoftWorld(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
+}
+
 module.exports = {
   patrolBase,
-  surplusStore
+  surplusStore,
+  redwolfAirsoft,
+  zeroOneAirsoft,
+  airsoftWorld
 }

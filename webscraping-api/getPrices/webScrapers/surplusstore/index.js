@@ -22,10 +22,11 @@ const getItemPrice = async (productUrl) => {
                 const oldPriceFloat = parseFloat(oldPrice)
 
                 const difference = oldPriceFloat - newPriceFloat
+                const discount = parseFloat(difference.toFixed(2))
 
                 itemDetails.splice(1,2)
                 itemDetails.push(1)
-                itemDetails.push(difference)
+                itemDetails.push(discount)
             } else {
                 itemDetails.push(0)
                 itemDetails.push(0)
