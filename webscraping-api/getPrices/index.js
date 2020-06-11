@@ -5,6 +5,8 @@ const surplusStore = require('./webScrapers/surplusstore')
 const redwolfAirsoft = require('./webScrapers/redwolfairsoft')
 const zeroOneAirsoft = require('./webScrapers/zerooneairsoft')
 const airsoftWorld = require('./webScrapers/airsoftworld')
+const landWarriorAirsoft = require('./webScrapers/landwarriorairsoft')
+const fireSupport = require('./webScrapers/firesupport')
 const insertPrice = require('./../insertPrices')
 
 const getDbCreds = async () => {
@@ -87,14 +89,45 @@ const getItemPriceAirsoftWorld = async (dbConnection) => {
   })
 }
 
+const getItemPriceLandWarriorAirsoft = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
+
+  JSON.parse(items).forEach(async item => {
+    if(item.landwarriorairsoft_url != null) {
+      const price = await landWarriorAirsoft.getItemPrice(item.landwarriorairsoft_url)
+      console.log('Land Warrior Airsoft', item.item_id, price)
+      if(price.length == 4) {
+        await insertPrice.landWarriorAirsoft(dbConnection, item.item_id, price)
+      }
+    }
+  })
+}
+
+const getItemPriceFireSupport = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
+
+  JSON.parse(items).forEach(async item => {
+    if(item.firesupport_url != null) {
+      const price = await fireSupport.getItemPrice(item.firesupport_url)
+      console.log('Fire Support', item.item_id, price)
+      if(price.length == 4) {
+        await insertPrice.fireSupport(dbConnection, item.item_id, price)
+      }
+    }
+  })
+}
+
+
 const getItemPrices = async () => {
     const dbCreds = await getDbCreds()
     const dbConnection = await getDbConnection(dbCreds)
-    await getItemPricePatrolBase(dbConnection)
-    await getItemPriceSurplusStore(dbConnection)
-    await getItemPriceRedwolfAirsoft(dbConnection)
-    await getItemPriceZeroOneAirsoft(dbConnection)
-    await getItemPriceAirsoftWorld(dbConnection)
+    // await getItemPricePatrolBase(dbConnection)
+    // await getItemPriceSurplusStore(dbConnection)
+    // await getItemPriceRedwolfAirsoft(dbConnection)
+    // await getItemPriceZeroOneAirsoft(dbConnection)
+    // await getItemPriceAirsoftWorld(dbConnection)
+    // await getItemPriceLandWarriorAirsoft(dbConnection)
+    await getItemPriceFireSupport(dbConnection)
 }
 
 module.exports = {

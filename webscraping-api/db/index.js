@@ -6,6 +6,8 @@ const insertSurplusStorePriceSQL = fs.readFileSync(__dirname + '/sql/insertSurpl
 const insertRedwolfAirsoftPriceSQL = fs.readFileSync(__dirname + '/sql/insertRedwolfAirsoftPrice.sql').toString()
 const insertZeroOneAirsoftSQL = fs.readFileSync(__dirname + '/sql/insertZeroOneAirsoftPrice.sql').toString()
 const insertAirsoftWorldSQL = fs.readFileSync(__dirname + '/sql/insertAirsoftWorldPrice.sql').toString()
+const insertLandWarriorAirsoftSQL = fs.readFileSync(__dirname + '/sql/insertLandWarriorAirsoftPrice.sql').toString()
+const insertFireSupportSQL = fs.readFileSync(__dirname + '/sql/insertFireSupportPrice.sql').toString()
 
 const getDbConnection = async (dbCreds) => {
   const dbConnection = mysql.createConnection({
@@ -130,6 +132,46 @@ const insertItemsAirsoftWorld = async (dbConnection, itemId, price, stockStatus,
   })
 }
 
+const insertItemsLandWarriorAirsoft = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+  const itemDetails = {
+    item_id: itemId,
+    land_warrior_airsoft_price: price,
+    land_warrior_airsoft_stock: stockStatus,
+    land_warrior_airsoft_sale: onSale,
+    land_warrior_airsoft_discount: priceDifference
+  }
+
+  return new Promise(function(resolve, reject) {
+    dbConnection.query(insertLandWarriorAirsoftSQL, [itemDetails, itemDetails], function ( error, results ) {
+      if (error){
+        console.log(error)
+      }
+      // console.log('inserted', itemDetails.item_id, error, results)
+    })
+    resolve()
+  })
+}
+
+const insertItemsFireSupport = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+  const itemDetails = {
+    item_id: itemId,
+    fire_support_price: price,
+    fire_support_stock: stockStatus,
+    fire_support_sale: onSale,
+    fire_support_discount: priceDifference
+  }
+
+  return new Promise(function(resolve, reject) {
+    dbConnection.query(insertFireSupportSQL, [itemDetails, itemDetails], function ( error, results ) {
+      if (error){
+        console.log(error)
+      }
+      // console.log('inserted', itemDetails.item_id, error, results)
+    })
+    resolve()
+  })
+}
+
 module.exports = {
   getDbConnection,
   getItems,
@@ -137,5 +179,7 @@ module.exports = {
   insertItemsSurplusStore,
   insertItemsRedwolfAirsoft,
   insertItemsZeroOneAirsoft,
-  insertItemsAirsoftWorld
+  insertItemsAirsoftWorld,
+  insertItemsLandWarriorAirsoft,
+  insertItemsFireSupport
 }

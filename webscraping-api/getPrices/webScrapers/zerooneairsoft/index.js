@@ -16,7 +16,7 @@ const getItemPrice = async (productUrl) => {
                 itemDetails.push(filteredPrice)
             })
             if(itemDetails[0].includes('OriginalPrice:')) {
-                const oldPrice = itemDetails[0].split("Price");
+                const oldPrice = itemDetails[0].split("Price")
                 const oldPriceFormatted = oldPrice[1].replace(":", "")
 
                 const currentPrice = itemDetails[0].split("CurrentPrice:");

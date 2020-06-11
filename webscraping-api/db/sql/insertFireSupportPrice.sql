@@ -1,0 +1,1 @@
+REPLACE INTO item_prices_fire_support SET ?
