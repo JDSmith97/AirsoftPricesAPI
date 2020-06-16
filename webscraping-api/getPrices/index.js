@@ -169,7 +169,7 @@ const getItemPrices = async () => {
     const dbCreds = await getDbCreds()
     const dbConnection = await getDbConnection(dbCreds)
     await getItemPricePatrolBase(dbConnection)
-    await getItemPriceSurplusStore(dbConnection)
+    // await getItemPriceSurplusStore(dbConnection)
     await getItemPriceRedwolfAirsoft(dbConnection)
     await getItemPriceZeroOneAirsoft(dbConnection)
     await getItemPriceAirsoftWorld(dbConnection)

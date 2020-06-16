@@ -30,7 +30,7 @@ const getItemPrice = async (productUrl) => {
                 itemDetails.push(0, 0)
             }
             $('div.stock.available span').each(function(i, element) {
-                itemDetails.push($(this).text())
+                itemDetails.push('In Stock')
             })
             if(itemDetails.length < 4) {
                 itemDetails.push('Out of Stock')
