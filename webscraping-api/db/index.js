@@ -10,6 +10,7 @@ const insertLandWarriorAirsoftSQL = fs.readFileSync(__dirname + '/sql/insertLand
 const insertFireSupportSQL = fs.readFileSync(__dirname + '/sql/insertFireSupportPrice.sql').toString()
 const insertWolfArmouriesSQL = fs.readFileSync(__dirname + '/sql/insertWolfArmouriesPrice.sql').toString()
 const insertSkirmshopSQL = fs.readFileSync(__dirname + '/sql/insertSkirmshopPrice.sql').toString()
+const insertBullseyeCountrySportSQL = fs.readFileSync(__dirname + '/sql/insertBullseyeCountrySportPrice.sql').toString()
 
 const getDbConnection = async (dbCreds) => {
   const dbConnection = mysql.createConnection({
@@ -214,6 +215,26 @@ const insertItemsSkirmshop = async (dbConnection, itemId, price, stockStatus, on
   })
 }
 
+const insertItemsBullseyeCountrySport = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+  const itemDetails = {
+    item_id: itemId,
+    bullseye_country_sport_price: price,
+    bullseye_country_sport_stock: stockStatus,
+    bullseye_country_sport_sale: onSale,
+    bullseye_country_sport_discount: priceDifference
+  }
+
+  return new Promise(function(resolve, reject) {
+    dbConnection.query(insertBullseyeCountrySportSQL, [itemDetails, itemDetails], function ( error, results ) {
+      if (error){
+        console.log(error)
+      }
+      // console.log('inserted', itemDetails.item_id, error, results)
+    })
+    resolve()
+  })
+}
+
 module.exports = {
   getDbConnection,
   getItems,
@@ -225,5 +246,6 @@ module.exports = {
   insertItemsLandWarriorAirsoft,
   insertItemsFireSupport,
   insertItemsWolfArmouries,
-  insertItemsSkirmshop
+  insertItemsSkirmshop,
+  insertItemsBullseyeCountrySport
 }

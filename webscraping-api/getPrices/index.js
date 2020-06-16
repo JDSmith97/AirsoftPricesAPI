@@ -10,6 +10,7 @@ const landWarriorAirsoft = require('./webScrapers/landwarriorairsoft')
 const fireSupport = require('./webScrapers/firesupport')
 const wolfArmouries = require('./webScrapers/wolfarmouries')
 const skirmshop = require('./webScrapers/skirmshop')
+const bulleyesCountrySport = require('./webScrapers/bulleyescountrysport')
 
 
 const insertPrice = require('./../insertPrices')
@@ -150,18 +151,33 @@ const getItemPriceSkirmshop = async (dbConnection) => {
   })
 }
 
+const getItemPriceBullseyeCountrySport = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
+
+  JSON.parse(items).forEach(async item => {
+    if(item.bullseyecountrysport_url != null) {
+      const price = await bulleyesCountrySport.getItemPrice(item.bullseyecountrysport_url)
+      console.log('Bullseye Country Sport', item.item_id, price)
+      if(price.length == 4) {
+        await insertPrice.bullseyeCountrySport(dbConnection, item.item_id, price)
+      }
+    }
+  })
+}
+
 const getItemPrices = async () => {
     const dbCreds = await getDbCreds()
     const dbConnection = await getDbConnection(dbCreds)
-    // await getItemPricePatrolBase(dbConnection)
-    // await getItemPriceSurplusStore(dbConnection)
-    // await getItemPriceRedwolfAirsoft(dbConnection)
-    // await getItemPriceZeroOneAirsoft(dbConnection)
-    // await getItemPriceAirsoftWorld(dbConnection)
-    // await getItemPriceLandWarriorAirsoft(dbConnection)
-    // await getItemPriceFireSupport(dbConnection)
-    // await getItemPriceWolfArmouries(dbConnection)
+    await getItemPricePatrolBase(dbConnection)
+    await getItemPriceSurplusStore(dbConnection)
+    await getItemPriceRedwolfAirsoft(dbConnection)
+    await getItemPriceZeroOneAirsoft(dbConnection)
+    await getItemPriceAirsoftWorld(dbConnection)
+    await getItemPriceLandWarriorAirsoft(dbConnection)
+    await getItemPriceFireSupport(dbConnection)
+    await getItemPriceWolfArmouries(dbConnection)
     await getItemPriceSkirmshop(dbConnection)
+    await getItemPriceBullseyeCountrySport(dbConnection)
 }
 
 module.exports = {
