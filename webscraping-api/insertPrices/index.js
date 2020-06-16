@@ -64,6 +64,24 @@ const fireSupport = async (dbConnection, itemId, items) => {
   await db.insertItemsFireSupport(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
 }
 
+const wolfArmouries = async (dbConnection, itemId, items) => {
+  const price = items[0]
+  const stockStatus = items[3]
+  const onSale = items[1]
+  const priceDifference = items[2]
+
+  await db.insertItemsWolfArmouries(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
+}
+
+const skirmshop = async (dbConnection, itemId, items) => {
+  const price = items[0]
+  const stockStatus = items[3]
+  const onSale = items[1]
+  const priceDifference = items[2]
+
+  await db.insertItemsSkirmshop(dbConnection, itemId, price, stockStatus, onSale, priceDifference)
+}
+
 module.exports = {
   patrolBase,
   surplusStore,
@@ -71,5 +89,7 @@ module.exports = {
   zeroOneAirsoft,
   airsoftWorld,
   landWarriorAirsoft,
-  fireSupport
+  fireSupport,
+  wolfArmouries,
+  skirmshop
 }

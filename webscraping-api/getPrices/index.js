@@ -1,5 +1,6 @@
 const db = require('./../db')
 const ssm = require('./../ssm')
+
 const patrolBase = require('./webScrapers/patrolbase')
 const surplusStore = require('./webScrapers/surplusstore')
 const redwolfAirsoft = require('./webScrapers/redwolfairsoft')
@@ -7,6 +8,10 @@ const zeroOneAirsoft = require('./webScrapers/zerooneairsoft')
 const airsoftWorld = require('./webScrapers/airsoftworld')
 const landWarriorAirsoft = require('./webScrapers/landwarriorairsoft')
 const fireSupport = require('./webScrapers/firesupport')
+const wolfArmouries = require('./webScrapers/wolfarmouries')
+const skirmshop = require('./webScrapers/skirmshop')
+
+
 const insertPrice = require('./../insertPrices')
 
 const getDbCreds = async () => {
@@ -117,6 +122,33 @@ const getItemPriceFireSupport = async (dbConnection) => {
   })
 }
 
+const getItemPriceWolfArmouries = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
+
+  JSON.parse(items).forEach(async item => {
+    if(item.wolfarmouries_url != null) {
+      const price = await wolfArmouries.getItemPrice(item.wolfarmouries_url)
+      console.log('Wolf Armouries', item.item_id, price)
+      if(price.length == 4) {
+        await insertPrice.wolfArmouries(dbConnection, item.item_id, price)
+      }
+    }
+  })
+}
+
+const getItemPriceSkirmshop = async (dbConnection) => {
+  let items = await db.getItems(dbConnection)
+
+  JSON.parse(items).forEach(async item => {
+    if(item.skirmshop_url != null) {
+      const price = await skirmshop.getItemPrice(item.skirmshop_url)
+      console.log('Skirmshop', item.item_id, price)
+      if(price.length == 4) {
+        await insertPrice.skirmshop(dbConnection, item.item_id, price)
+      }
+    }
+  })
+}
 
 const getItemPrices = async () => {
     const dbCreds = await getDbCreds()
@@ -127,7 +159,9 @@ const getItemPrices = async () => {
     // await getItemPriceZeroOneAirsoft(dbConnection)
     // await getItemPriceAirsoftWorld(dbConnection)
     // await getItemPriceLandWarriorAirsoft(dbConnection)
-    await getItemPriceFireSupport(dbConnection)
+    // await getItemPriceFireSupport(dbConnection)
+    // await getItemPriceWolfArmouries(dbConnection)
+    await getItemPriceSkirmshop(dbConnection)
 }
 
 module.exports = {

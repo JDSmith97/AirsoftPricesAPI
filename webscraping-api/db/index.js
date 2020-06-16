@@ -8,6 +8,8 @@ const insertZeroOneAirsoftSQL = fs.readFileSync(__dirname + '/sql/insertZeroOneA
 const insertAirsoftWorldSQL = fs.readFileSync(__dirname + '/sql/insertAirsoftWorldPrice.sql').toString()
 const insertLandWarriorAirsoftSQL = fs.readFileSync(__dirname + '/sql/insertLandWarriorAirsoftPrice.sql').toString()
 const insertFireSupportSQL = fs.readFileSync(__dirname + '/sql/insertFireSupportPrice.sql').toString()
+const insertWolfArmouriesSQL = fs.readFileSync(__dirname + '/sql/insertWolfArmouriesPrice.sql').toString()
+const insertSkirmshopSQL = fs.readFileSync(__dirname + '/sql/insertSkirmshopPrice.sql').toString()
 
 const getDbConnection = async (dbCreds) => {
   const dbConnection = mysql.createConnection({
@@ -172,6 +174,46 @@ const insertItemsFireSupport = async (dbConnection, itemId, price, stockStatus, 
   })
 }
 
+const insertItemsWolfArmouries = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+  const itemDetails = {
+    item_id: itemId,
+    wolf_armouries_price: price,
+    wolf_armouries_stock: stockStatus,
+    wolf_armouries_sale: onSale,
+    wolf_armouries_discount: priceDifference
+  }
+
+  return new Promise(function(resolve, reject) {
+    dbConnection.query(insertWolfArmouriesSQL, [itemDetails, itemDetails], function ( error, results ) {
+      if (error){
+        console.log(error)
+      }
+      // console.log('inserted', itemDetails.item_id, error, results)
+    })
+    resolve()
+  })
+}
+
+const insertItemsSkirmshop = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+  const itemDetails = {
+    item_id: itemId,
+    skirmshop_price: price,
+    skirmshop_stock: stockStatus,
+    skirmshop_sale: onSale,
+    skirmshop_discount: priceDifference
+  }
+
+  return new Promise(function(resolve, reject) {
+    dbConnection.query(insertSkirmshopSQL, [itemDetails, itemDetails], function ( error, results ) {
+      if (error){
+        console.log(error)
+      }
+      // console.log('inserted', itemDetails.item_id, error, results)
+    })
+    resolve()
+  })
+}
+
 module.exports = {
   getDbConnection,
   getItems,
@@ -181,5 +223,7 @@ module.exports = {
   insertItemsZeroOneAirsoft,
   insertItemsAirsoftWorld,
   insertItemsLandWarriorAirsoft,
-  insertItemsFireSupport
+  insertItemsFireSupport,
+  insertItemsWolfArmouries,
+  insertItemsSkirmshop
 }

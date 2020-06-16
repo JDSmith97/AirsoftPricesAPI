@@ -25,11 +25,9 @@ const getItemPrice = async (productUrl) => {
                 const discount = parseFloat(difference.toFixed(2))
 
                 itemDetails.splice(1,2)
-                itemDetails.push(1)
-                itemDetails.push(discount)
+                itemDetails.push(1, discount)
             } else {
-                itemDetails.push(0)
-                itemDetails.push(0)
+                itemDetails.push(0, 0)
             }
             $('div.stock.available span').each(function(i, element) {
                 itemDetails.push($(this).text())

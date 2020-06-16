@@ -23,11 +23,9 @@ const getItemPrice = async (productUrl) => {
                 const difference = oldPriceFloat - newPriceFloat
 
                 itemDetails.splice(1,2)
-                itemDetails.push(1)
-                itemDetails.push(difference)
+                itemDetails.push(1, difference)
             } else {
-                itemDetails.push(0)
-                itemDetails.push(0)
+                itemDetails.push(0, 0)
             }
             $('div.content-block.detail-stock-message div.stock-message script').each(function(i, element) {
                 const stock = JSON.parse($(this).html())

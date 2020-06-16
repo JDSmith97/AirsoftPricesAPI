@@ -16,9 +16,7 @@ const getItemPrice = async (productUrl) => {
 
                 const currentPrice = filtered.split("Price:")
 
-                itemDetails.push(currentPrice[1])
-                itemDetails.push(0)
-                itemDetails.push(0)
+                itemDetails.push(currentPrice[1], 0, 0)
             })
             $('div.showstockqty').each(function(i, element) {
                 const stock = $(this).text()

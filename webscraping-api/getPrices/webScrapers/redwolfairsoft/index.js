@@ -42,7 +42,7 @@ const getItemPrice = async (productUrl) => {
                 const newPrice = itemDetails[0].replace(/GBP/g, "")
 
                 itemDetails.push(newPrice)
-                itemDetails.splice(0,1)
+                itemDetails.splice(0, 1)
 
                 //Not a deal
                 itemDetails.push(0, 0)

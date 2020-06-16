@@ -30,9 +30,7 @@ const getItemPrice = async (productUrl) => {
                 const discount = parseFloat(difference.toFixed(2))
 
                 itemDetails.splice(0,1)
-                itemDetails.push(currentPriceFormatted)
-                itemDetails.push(1)
-                itemDetails.push(discount)
+                itemDetails.push(currentPriceFormatted, 1, discount)
             }
             else if(itemDetails[0].includes('Was:')) {
                 itemDetails.splice(0,1)
@@ -60,11 +58,9 @@ const getItemPrice = async (productUrl) => {
                 const discount = parseFloat(difference.toFixed(2))
 
                 itemDetails.splice(0,1)
-                itemDetails.push(1)
-                itemDetails.push(discount)
+                itemDetails.push(1, discount)
             } else {
-                itemDetails.push(0)
-                itemDetails.push(0)
+                itemDetails.push(0, 0)
             }
             $('td.ProductInfoMainStock').each(function(i, element) {
                 const stock = $(this).text()

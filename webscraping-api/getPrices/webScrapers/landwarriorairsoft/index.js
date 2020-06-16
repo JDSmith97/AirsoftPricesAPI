@@ -14,9 +14,7 @@ const getItemPrice = async (productUrl) => {
                 const unfiltered = $(this).text()
 
                 const filtered = unfiltered.replace(/\s/g, "")
-                itemDetails.push(filtered)
-                itemDetails.push(0)
-                itemDetails.push(0)
+                itemDetails.push(filtered, 0, 0)
             })
             $('#product_stock_info span.product_stock_level').each(function(i, element) {
                 const stock = $(this).text()
