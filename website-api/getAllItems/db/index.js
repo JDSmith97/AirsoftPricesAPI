@@ -21,7 +21,7 @@ const getItems = async (dbConnection) => {
       if (error){
         console.log(error)
       }
-      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results)));
+      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
     })
   })
 }
