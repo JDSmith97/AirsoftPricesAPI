@@ -12,6 +12,19 @@ const insertWolfArmouriesSQL = fs.readFileSync(__dirname + '/sql/insertWolfArmou
 const insertSkirmshopSQL = fs.readFileSync(__dirname + '/sql/insertSkirmshopPrice.sql').toString()
 const insertBullseyeCountrySportSQL = fs.readFileSync(__dirname + '/sql/insertBullseyeCountrySportPrice.sql').toString()
 
+const sqlPrices = {
+  "patrol_base": insertPatrolBasePriceSQL,
+  "surplus_store": insertSurplusStorePriceSQL,
+  "redwolf_airsoft": insertRedwolfAirsoftPriceSQL,
+  "zero_one_airsoft": insertZeroOneAirsoftSQL,
+  "airsoft_world": insertAirsoftWorldSQL,
+  "land_warrior_airsoft": insertLandWarriorAirsoftSQL,
+  "fire_support": insertFireSupportSQL,
+  "wolf_armouries": insertWolfArmouriesSQL,
+  "skirmshop": insertSkirmshopSQL,
+  "bullseye_country_sport": insertBullseyeCountrySportSQL
+}
+
 const getDbConnection = async (dbCreds) => {
   const dbConnection = mysql.createConnection({
     host     : dbCreds.db_host,
@@ -35,204 +48,63 @@ const getItems = async (dbConnection) => {
   })
 }
 
-const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+const insertItemDetails = (dbConnection, store, itemId, price, stockStatus, onSale, priceDifference) => {
   const itemDetails = {
     item_id: itemId,
-    patrol_base_price: price,
-    patrol_base_stock: stockStatus,
-    patrol_base_sale: onSale,
-    patrol_base_discount: priceDifference
+    [`${store}_price`]: price,
+    [`${store}_stock`]: stockStatus,
+    [`${store}_sale`]: onSale,
+    [`${store}_discount`]: priceDifference
   }
 
   return new Promise(function(resolve, reject) {
-    dbConnection.query(insertPatrolBasePriceSQL, [itemDetails, itemDetails], function ( error, results ) {
+    dbConnection.query(sqlPrices[store], [itemDetails, itemDetails], function ( error, results ) {
       if (error){
         console.log(error)
       }
-      // console.log('inserted', itemDetails.item_id, error, results)
     })
     resolve()
   })
+}
+
+const insertItemsPatrolBase = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
+  insertItemDetails(dbConnection, "patrol_base", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsSurplusStore = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    surplus_store_price: price,
-    surplus_store_stock: stockStatus,
-    surplus_store_sale: onSale,
-    surplus_store_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertSurplusStorePriceSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "surplus_store", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsRedwolfAirsoft = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    redwolf_airsoft_price: price,
-    redwolf_airsoft_stock: stockStatus,
-    redwolf_airsoft_sale: onSale,
-    redwolf_airsoft_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertRedwolfAirsoftPriceSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "redwolf_airsoft", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsZeroOneAirsoft = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    zero_one_airsoft_price: price,
-    zero_one_airsoft_stock: stockStatus,
-    zero_one_airsoft_sale: onSale,
-    zero_one_airsoft_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertZeroOneAirsoftSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "zero_one_airsoft", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsAirsoftWorld = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    airsoft_world_price: price,
-    airsoft_world_stock: stockStatus,
-    airsoft_world_sale: onSale,
-    airsoft_world_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertAirsoftWorldSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "airsoft_world", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsLandWarriorAirsoft = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    land_warrior_airsoft_price: price,
-    land_warrior_airsoft_stock: stockStatus,
-    land_warrior_airsoft_sale: onSale,
-    land_warrior_airsoft_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertLandWarriorAirsoftSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "land_warrior_airsoft", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsFireSupport = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    fire_support_price: price,
-    fire_support_stock: stockStatus,
-    fire_support_sale: onSale,
-    fire_support_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertFireSupportSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "fire_support", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsWolfArmouries = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    wolf_armouries_price: price,
-    wolf_armouries_stock: stockStatus,
-    wolf_armouries_sale: onSale,
-    wolf_armouries_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertWolfArmouriesSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "wolf_armouries", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsSkirmshop = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    skirmshop_price: price,
-    skirmshop_stock: stockStatus,
-    skirmshop_sale: onSale,
-    skirmshop_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertSkirmshopSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "skirmshop", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 const insertItemsBullseyeCountrySport = async (dbConnection, itemId, price, stockStatus, onSale, priceDifference) => {
-  const itemDetails = {
-    item_id: itemId,
-    bullseye_country_sport_price: price,
-    bullseye_country_sport_stock: stockStatus,
-    bullseye_country_sport_sale: onSale,
-    bullseye_country_sport_discount: priceDifference
-  }
-
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(insertBullseyeCountrySportSQL, [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
-      }
-      // console.log('inserted', itemDetails.item_id, error, results)
-    })
-    resolve()
-  })
+  insertItemDetails(dbConnection, "bullseye_country_sport", itemId, price, stockStatus, onSale, priceDifference)
 }
 
 module.exports = {

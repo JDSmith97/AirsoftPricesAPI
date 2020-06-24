@@ -25,144 +25,102 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-const getItemPricePatrolBase = async (dbConnection) => {
+const webscrappers = {
+  "patrolbase": {
+    webscrapper: patrolBase,
+    price: insertPrice.patrolBase
+  },
+  "surplusstore": {
+    webscrapper: surplusStore,
+    price: insertPrice.surplusStore
+  },
+  "redwolfairsoft": {
+    webscrapper: redwolfAirsoft,
+    price: insertPrice.redwolfAirsoft
+  },
+  "zerooneairsoft": {
+    webscrapper: zeroOneAirsoft,
+    price: insertPrice.zeroOneAirsoft
+  },
+  "airsoftworld": {
+    webscrapper: airsoftWorld,
+    price: insertPrice.airsoftWorld
+  },
+  "landwarriorairsoft": {
+    webscrapper: landWarriorAirsoft,
+    price: insertPrice.landWarriorAirsoft
+  },
+  "firesupport": {
+    webscrapper: fireSupport,
+    price: insertPrice.fireSupport
+  },
+  "wolfarmouries": {
+    webscrapper: wolfArmouries,
+    price: insertPrice.wolfArmouries
+  },
+  "skirmshop": {
+    webscrapper: skirmshop,
+    price: insertPrice.skirmshop
+  },
+  "bullseyecountrysport": {
+    webscrapper: bulleyesCountrySport,
+    price: insertPrice.bullseyeCountrySport
+  }
+}
+
+const insertPrices = async (dbConnection, store) => {
   let items = await db.getItems(dbConnection)
+  const data = webscrappers[store]
 
   JSON.parse(items).forEach(async item => {
-    if(item.patrolbase_url != null) {
-      const price = await patrolBase.getItemPrice(item.patrolbase_url)
-      console.log('Patrol Base', item.item_id, price)
+    if(item[`${store}_url`] != null) {
+      const price = await data.webscrapper.getItemPrice(item[`${store}_url`])
+      console.log(store, item.item_id, price)
       if(price.length == 4) {
-        await insertPrice.patrolBase(dbConnection, item.item_id, price)
+        await data.price(dbConnection, item.item_id, price)
       }
     }
   })
+}
+
+const getItemPricePatrolBase = async (dbConnection) => {
+  insertPrices(dbConnection, "patrolbase")
 }
 
 const getItemPriceSurplusStore = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.surplusstore_url != null) {
-      const price = await surplusStore.getItemPrice(item.surplusstore_url)
-      console.log('Surplus Store', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.surplusStore(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "surplusstore")
 }
 
 const getItemPriceRedwolfAirsoft = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.redwolfairsoft_url != null) {
-      const price = await redwolfAirsoft.getItemPrice(item.redwolfairsoft_url)
-      console.log('Redwolf Airsoft', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.redwolfAirsoft(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "redwolfairsoft")
 }
 
 const getItemPriceZeroOneAirsoft = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.zerooneairsoft_url != null) {
-      const price = await zeroOneAirsoft.getItemPrice(item.zerooneairsoft_url)
-      console.log('Zero One Airsoft', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.zeroOneAirsoft(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "zerooneairsoft")
 }
 
 const getItemPriceAirsoftWorld = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.airsoftworld_url != null) {
-      const price = await airsoftWorld.getItemPrice(item.airsoftworld_url)
-      console.log('Airsoft World', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.airsoftWorld(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "airsoftworld")
 }
 
 const getItemPriceLandWarriorAirsoft = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.landwarriorairsoft_url != null) {
-      const price = await landWarriorAirsoft.getItemPrice(item.landwarriorairsoft_url)
-      console.log('Land Warrior Airsoft', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.landWarriorAirsoft(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "landwarriorairsoft")
 }
 
 const getItemPriceFireSupport = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.firesupport_url != null) {
-      const price = await fireSupport.getItemPrice(item.firesupport_url)
-      console.log('Fire Support', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.fireSupport(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "firesupport")
 }
 
 const getItemPriceWolfArmouries = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.wolfarmouries_url != null) {
-      const price = await wolfArmouries.getItemPrice(item.wolfarmouries_url)
-      console.log('Wolf Armouries', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.wolfArmouries(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "wolfarmouries")
 }
 
 const getItemPriceSkirmshop = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.skirmshop_url != null) {
-      const price = await skirmshop.getItemPrice(item.skirmshop_url)
-      console.log('Skirmshop', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.skirmshop(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "skirmshop")
 }
 
 const getItemPriceBullseyeCountrySport = async (dbConnection) => {
-  let items = await db.getItems(dbConnection)
-
-  JSON.parse(items).forEach(async item => {
-    if(item.bullseyecountrysport_url != null) {
-      const price = await bulleyesCountrySport.getItemPrice(item.bullseyecountrysport_url)
-      console.log('Bullseye Country Sport', item.item_id, price)
-      if(price.length == 4) {
-        await insertPrice.bullseyeCountrySport(dbConnection, item.item_id, price)
-      }
-    }
-  })
+  insertPrices(dbConnection, "bullseyecountrysport")
 }
 
 const getItemPrices = async () => {
@@ -170,14 +128,14 @@ const getItemPrices = async () => {
     const dbConnection = await getDbConnection(dbCreds)
     await getItemPricePatrolBase(dbConnection)
     // await getItemPriceSurplusStore(dbConnection)
-    await getItemPriceRedwolfAirsoft(dbConnection)
-    await getItemPriceZeroOneAirsoft(dbConnection)
-    await getItemPriceAirsoftWorld(dbConnection)
-    await getItemPriceLandWarriorAirsoft(dbConnection)
-    await getItemPriceFireSupport(dbConnection)
-    await getItemPriceWolfArmouries(dbConnection)
-    await getItemPriceSkirmshop(dbConnection)
-    await getItemPriceBullseyeCountrySport(dbConnection)
+    // await getItemPriceRedwolfAirsoft(dbConnection) 
+    // await getItemPriceZeroOneAirsoft(dbConnection)
+    // await getItemPriceAirsoftWorld(dbConnection)
+    // await getItemPriceLandWarriorAirsoft(dbConnection)
+    // await getItemPriceFireSupport(dbConnection)
+    // await getItemPriceWolfArmouries(dbConnection)
+    // await getItemPriceSkirmshop(dbConnection)
+    // await getItemPriceBullseyeCountrySport(dbConnection)
 }
 
 module.exports = {
