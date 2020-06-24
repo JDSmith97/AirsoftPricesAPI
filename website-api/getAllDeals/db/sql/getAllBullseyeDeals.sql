@@ -2,4 +2,4 @@ SELECT item_prices_bullseye_country_sport.item_id, bullseye_country_sport_price 
 item_prices_bullseye_country_sport
 LEFT JOIN items
 ON item_prices_bullseye_country_sport.item_id = items.item_id
-ORDER BY bullseye_country_sport_discount DESC LIMIT 5
+WHERE bullseye_country_sport_discount > 0;

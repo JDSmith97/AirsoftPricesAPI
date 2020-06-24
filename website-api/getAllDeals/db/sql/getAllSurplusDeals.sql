@@ -2,4 +2,4 @@ SELECT item_prices_surplus_store.item_id, surplus_store_price AS item_price, sur
 item_prices_surplus_store
 LEFT JOIN items
 ON item_prices_surplus_store.item_id = items.item_id
-ORDER BY surplus_store_discount DESC LIMIT 5
+WHERE surplus_store_discount > 0;

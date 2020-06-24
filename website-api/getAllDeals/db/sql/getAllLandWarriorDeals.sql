@@ -2,4 +2,4 @@ SELECT item_prices_land_warrior_airsoft.item_id, land_warrior_airsoft_price AS i
 item_prices_land_warrior_airsoft
 LEFT JOIN items
 ON item_prices_land_warrior_airsoft.item_id = items.item_id
-ORDER BY land_warrior_airsoft_discount DESC LIMIT 5
+WHERE land_warrior_airsoft_discount > 0;

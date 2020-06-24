@@ -1,16 +1,16 @@
 const mysql = require('mysql')
 const fs = require('fs')
 
-const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAirsoftWorldDeals.sql').toString()
-const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getBullseyeDeals.sql').toString()
-const getFireSupportDealsSql = fs.readFileSync(__dirname + '/sql/getFireSupportDeals.sql').toString()
-const getLandWarriorDealsSql = fs.readFileSync(__dirname + '/sql/getLandWarriorDeals.sql').toString()
-const getPatrolBaseDealsSql = fs.readFileSync(__dirname + '/sql/getPatrolBaseDeals.sql').toString()
-const getRedwolfAirsoftDealsSql = fs.readFileSync(__dirname + '/sql/getRedwolfAirsoftDeals.sql').toString()
-const getSkirmshopDealsSql = fs.readFileSync(__dirname + '/sql/getSkirmshopDeals.sql').toString()
-const getSurplusDealsSql = fs.readFileSync(__dirname + '/sql/getSurplusDeals.sql').toString()
-const getWolfArmouriesDealsSql = fs.readFileSync(__dirname + '/sql/getWolfArmouriesDeals.sql').toString()
-const getZeroOneDealsSql = fs.readFileSync(__dirname + '/sql/getZeroOneDeals.sql').toString()
+const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAllAirsoftWorldDeals.sql').toString()
+const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getAllBullseyeDeals.sql').toString()
+const getFireSupportDealsSql = fs.readFileSync(__dirname + '/sql/getAllFireSupportDeals.sql').toString()
+const getLandWarriorDealsSql = fs.readFileSync(__dirname + '/sql/getAllLandWarriorDeals.sql').toString()
+const getPatrolBaseDealsSql = fs.readFileSync(__dirname + '/sql/getAllPatrolBaseDeals.sql').toString()
+const getRedwolfAirsoftDealsSql = fs.readFileSync(__dirname + '/sql/getAllRedwolfAirsoftDeals.sql').toString()
+const getSkirmshopDealsSql = fs.readFileSync(__dirname + '/sql/getAllSkirmshopDeals.sql').toString()
+const getSurplusDealsSql = fs.readFileSync(__dirname + '/sql/getAllSurplusDeals.sql').toString()
+const getWolfArmouriesDealsSql = fs.readFileSync(__dirname + '/sql/getAllWolfArmouriesDeals.sql').toString()
+const getZeroOneDealsSql = fs.readFileSync(__dirname + '/sql/getAllZeroOneDeals.sql').toString()
 
 const getDbConnection = async (dbCreds) => {
   const dbConnection = mysql.createConnection({
@@ -191,7 +191,7 @@ const getDeals = async (dbConnection) => {
       return parseFloat(a.item_discount) - parseFloat(b.item_discount);
     });
     topDeals.reverse()
-    resolve(topDeals.slice(0, 5))
+    resolve(topDeals)
   })
 }
 

@@ -2,4 +2,4 @@ SELECT item_prices_wolf_armouries.item_id, wolf_armouries_price AS item_price, w
 item_prices_wolf_armouries
 LEFT JOIN items
 ON item_prices_wolf_armouries.item_id = items.item_id
-ORDER BY wolf_armouries_discount DESC LIMIT 5
+WHERE wolf_armouries_discount > 0;

@@ -1,6 +1,6 @@
 const getAllDeals = require('./getAllDeals')
 
-module.exports.handler = async function (event, context, callback) {
+const test = async function (event, context, callback) {
   try {
     const items = await getAllDeals.getDeals()
 
@@ -19,3 +19,5 @@ module.exports.handler = async function (event, context, callback) {
     console.log(err)
   }
 }
+
+test()

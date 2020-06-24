@@ -2,4 +2,4 @@ SELECT item_prices_skirmshop.item_id, skirmshop_price AS item_price, skirmshop_d
 item_prices_skirmshop
 LEFT JOIN items
 ON item_prices_skirmshop.item_id = items.item_id
-ORDER BY skirmshop_discount DESC LIMIT 5
+WHERE skirmshop_discount > 0;

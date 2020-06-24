@@ -2,4 +2,4 @@ SELECT item_prices_airsoft_world.item_id, airsoft_world_price AS item_price, air
 item_prices_airsoft_world
 LEFT JOIN items
 ON item_prices_airsoft_world.item_id = items.item_id
-ORDER BY airsoft_world_discount DESC LIMIT 5
+WHERE airsoft_world_discount > 0;

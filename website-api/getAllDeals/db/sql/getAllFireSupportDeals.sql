@@ -2,4 +2,4 @@ SELECT item_prices_fire_support.item_id, fire_support_price AS item_price, fire_
 item_prices_fire_support
 LEFT JOIN items
 ON item_prices_fire_support.item_id = items.item_id
-ORDER BY fire_support_discount DESC LIMIT 5
+WHERE fire_support_discount > 0;
