@@ -12,7 +12,7 @@ const insertWolfArmouriesSQL = fs.readFileSync(__dirname + '/sql/insertWolfArmou
 const insertSkirmshopSQL = fs.readFileSync(__dirname + '/sql/insertSkirmshopPrice.sql').toString()
 const insertBullseyeCountrySportSQL = fs.readFileSync(__dirname + '/sql/insertBullseyeCountrySportPrice.sql').toString()
 
-const sqlPrices = {
+const pricesSql = {
   "patrol_base": insertPatrolBasePriceSQL,
   "surplus_store": insertSurplusStorePriceSQL,
   "redwolf_airsoft": insertRedwolfAirsoftPriceSQL,
@@ -37,18 +37,26 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-const getItems = async (dbConnection) => {
+const closeDbConnection = async (dbConnection) => {
+  return new Promise(function(resolve, reject) {
+    dbConnection.end(error => error ? reject(error) : resolve("DB Connection ended"))
+  })
+}
+
+const getItems = async (dbCreds) => {
+  const dbConnection = await getDbConnection(dbCreds)
+
   return new Promise(function(resolve, reject) {
     dbConnection.query('SELECT * FROM items', function (error, results, fields) {
       if (error){
         console.log(error)
       }
-      resolve(JSON.stringify(results))
+      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
     })
   })
 }
 
-const insertItemDetails = (dbConnection, store, itemId, price, stockStatus, onSale, priceDifference) => {
+const insertItemDetails = async (dbCreds, store, itemId, price, stockStatus, onSale, priceDifference) => {
   const itemDetails = {
     item_id: itemId,
     [`${store}_price`]: price,
@@ -57,13 +65,15 @@ const insertItemDetails = (dbConnection, store, itemId, price, stockStatus, onSa
     [`${store}_discount`]: priceDifference
   }
 
+  const dbConnection = await getDbConnection(dbCreds)
+
   return new Promise(function(resolve, reject) {
-    dbConnection.query(sqlPrices[store], [itemDetails, itemDetails], function ( error, results ) {
+    dbConnection.query(pricesSql[store], [itemDetails, itemDetails], function ( error, results ) {
       if (error){
         console.log(error)
       }
     })
-    resolve()
+    dbConnection.end(error => error ? reject(error) : resolve("DB Connection ended"))
   })
 }
 
@@ -119,5 +129,6 @@ module.exports = {
   insertItemsFireSupport,
   insertItemsWolfArmouries,
   insertItemsSkirmshop,
-  insertItemsBullseyeCountrySport
+  insertItemsBullseyeCountrySport,
+  closeDbConnection
 }

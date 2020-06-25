@@ -12,7 +12,7 @@ module.exports.handler = async function (event, context, callback) {
       },
       body: items
     };
-
+    
     callback(null, response);
   }
   catch(err) {

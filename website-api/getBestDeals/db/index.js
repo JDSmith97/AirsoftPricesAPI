@@ -191,7 +191,7 @@ const getDeals = async (dbConnection) => {
       return parseFloat(a.item_discount) - parseFloat(b.item_discount);
     });
     topDeals.reverse()
-    resolve(topDeals.slice(0, 5))
+    resolve(topDeals.slice(0, 3))
   })
 }
 

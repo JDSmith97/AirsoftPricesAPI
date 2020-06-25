@@ -68,8 +68,8 @@ const webscrappers = {
   }
 }
 
-const insertPrices = async (dbConnection, store) => {
-  let items = await db.getItems(dbConnection)
+const insertPrices = async (dbCreds, store) => {
+  let items = await db.getItems(dbCreds)
   const data = webscrappers[store]
 
   JSON.parse(items).forEach(async item => {
@@ -77,14 +77,14 @@ const insertPrices = async (dbConnection, store) => {
       const price = await data.webscrapper.getItemPrice(item[`${store}_url`])
       console.log(store, item.item_id, price)
       if(price.length == 4) {
-        await data.price(dbConnection, item.item_id, price)
+        await data.price(dbCreds, item.item_id, price)
       }
     }
   })
 }
 
-const getItemPricePatrolBase = async (dbConnection) => {
-  insertPrices(dbConnection, "patrolbase")
+const getItemPricePatrolBase = async (dbCreds) => {
+  insertPrices(dbCreds, "patrolbase")
 }
 
 const getItemPriceSurplusStore = async (dbConnection) => {
@@ -125,17 +125,16 @@ const getItemPriceBullseyeCountrySport = async (dbConnection) => {
 
 const getItemPrices = async () => {
     const dbCreds = await getDbCreds()
-    const dbConnection = await getDbConnection(dbCreds)
-    await getItemPricePatrolBase(dbConnection)
-    // await getItemPriceSurplusStore(dbConnection)
-    // await getItemPriceRedwolfAirsoft(dbConnection) 
-    // await getItemPriceZeroOneAirsoft(dbConnection)
-    // await getItemPriceAirsoftWorld(dbConnection)
-    // await getItemPriceLandWarriorAirsoft(dbConnection)
-    // await getItemPriceFireSupport(dbConnection)
-    // await getItemPriceWolfArmouries(dbConnection)
-    // await getItemPriceSkirmshop(dbConnection)
-    // await getItemPriceBullseyeCountrySport(dbConnection)
+    await getItemPricePatrolBase(dbCreds)
+    // await getItemPriceSurplusStore(dbCreds)
+    await getItemPriceRedwolfAirsoft(dbCreds) 
+    await getItemPriceZeroOneAirsoft(dbCreds)
+    await getItemPriceAirsoftWorld(dbCreds)
+    await getItemPriceLandWarriorAirsoft(dbCreds)
+    await getItemPriceFireSupport(dbCreds)
+    await getItemPriceWolfArmouries(dbCreds)
+    await getItemPriceSkirmshop(dbCreds)
+    await getItemPriceBullseyeCountrySport(dbCreds)
 }
 
 module.exports = {

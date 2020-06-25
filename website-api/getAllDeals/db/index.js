@@ -24,122 +24,81 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-const getAirsoftWorldDeals = async (dbConnection) => {
+const closeDbConnection = async (dbConnection) => {
   return new Promise(function(resolve, reject) {
-    dbConnection.query(getAirsoftWorldDealsSql, function (error, results, fields) {
+    dbConnection.end(error => error ? reject(error) : resolve("DB Connection ended"))
+  })
+}
+
+const dealsSql = {
+  "patrol_base": getPatrolBaseDealsSql,
+  "surplus_store": getSurplusDealsSql,
+  "redwolf_airsoft": getRedwolfAirsoftDealsSql,
+  "zero_one_airsoft": getZeroOneDealsSql,
+  "airsoft_world": getAirsoftWorldDealsSql,
+  "land_warrior_airsoft": getLandWarriorDealsSql,
+  "fire_support": getFireSupportDealsSql,
+  "wolf_armouries": getWolfArmouriesDealsSql,
+  "skirmshop": getSkirmshopDealsSql,
+  "bullseye_country_sport": getBullseyeDealsSql
+}
+
+const getItemDeals = (dbConnection, store) => {
+  return new Promise(function(resolve, reject) {
+    dbConnection.query(dealsSql[store], function (error, results, fields) {
       if (error){
         console.log(error)
       }
       resolve(JSON.stringify(results))
     })
   })
+}
+
+const getAirsoftWorldDeals = async (dbConnection) => {
+  return getItemDeals(dbConnection, "airsoft_world")
 }
 
 const getBullseyeDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getBullseyeDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "bullseye_country_sport")
 }
 
 const getFireSupportDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getFireSupportDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "fire_support")
 }
 
 const getLandWarriorDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getLandWarriorDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "land_warrior_airsoft")
 }
 
 const getPatrolBaseDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getPatrolBaseDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "patrol_base")
 }
 
 const getRedwolfAirsoftDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getRedwolfAirsoftDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "redwolf_airsoft")
 }
 
 const getSkirmshopDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getSkirmshopDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "skirmshop")
 }
 
 const getSurplusDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getSurplusDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "surplus_store")
 }
 
 const getWolfArmouriesDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getWolfArmouriesDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
-  })
+  return getItemDeals(dbConnection, "wolf_armouries")
 }
 
 const getZeroOneDeals = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.query(getZeroOneDealsSql, function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
-    })
-  })
+  return getItemDeals(dbConnection, "zero_one_airsoft")
 }
 
 const getDeals = async (dbConnection) => {
   return new Promise(async function(resolve, reject) {
-    let topDeals = []
-    const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
-    const topDealsPush = (deal, store) => {
-      return  topDeals.push({
+    let allDeals = []
+    const allDealsPush = (deal, store) => {
+      return  allDeals.push({
         item_id: deal.item_id,
         item_price: deal.item_price,
         item_discount: deal.item_discount,
@@ -148,50 +107,52 @@ const getDeals = async (dbConnection) => {
         store: store
       })
     }
+    const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
     JSON.parse(airsoftWorld).forEach(deal => {
-      topDealsPush(deal, 'AirsoftWorld')
+      allDealsPush(deal, 'AirsoftWorld')
     })
     const bullseye = await getBullseyeDeals(dbConnection)
     JSON.parse(bullseye).forEach(deal => {
-      topDealsPush(deal, 'BullseyeCountrySport')
+      allDealsPush(deal, 'BullseyeCountrySport')
     })
     const fireSupport = await getFireSupportDeals(dbConnection)
     JSON.parse(fireSupport).forEach(deal => {
-      topDealsPush(deal, 'FireSupport')
+      allDealsPush(deal, 'FireSupport')
     })
     const landWarrior = await getLandWarriorDeals(dbConnection)
     JSON.parse(landWarrior).forEach(deal => {
-      topDealsPush(deal, 'LandWarrior')
+      allDealsPush(deal, 'LandWarrior')
     })
     const patrolBase = await getPatrolBaseDeals(dbConnection)
     JSON.parse(patrolBase).forEach(deal => {
-      topDealsPush(deal, 'PatrolBase')
+      allDealsPush(deal, 'PatrolBase')
     })
     const redwolfAirsoft = await getRedwolfAirsoftDeals(dbConnection)
     JSON.parse(redwolfAirsoft).forEach(deal => {
-      topDealsPush(deal, 'RedwolfAirsoft')
+      allDealsPush(deal, 'RedwolfAirsoft')
     })
     const skirmshop = await getSkirmshopDeals(dbConnection)
     JSON.parse(skirmshop).forEach(deal => {
-      topDealsPush(deal, 'Skirmshop')
+      allDealsPush(deal, 'Skirmshop')
     })
     const surplus = await getSurplusDeals(dbConnection)
     JSON.parse(surplus).forEach(deal => {
-      topDealsPush(deal, 'Surplus')
+      allDealsPush(deal, 'Surplus')
     })
     const wolfArmouries = await getWolfArmouriesDeals(dbConnection)
     JSON.parse(wolfArmouries).forEach(deal => {
-      topDealsPush(deal, 'WolfArmouries')
+      allDealsPush(deal, 'WolfArmouries')
     })
     const zeroOne = await getZeroOneDeals(dbConnection)
     JSON.parse(zeroOne).forEach(deal => {
-      topDealsPush(deal, 'ZeroOne')
+      allDealsPush(deal, 'ZeroOne')
     })
-    topDeals.sort(function(a, b) {
+    await closeDbConnection(dbConnection)
+    allDeals.sort(function(a, b) {
       return parseFloat(a.item_discount) - parseFloat(b.item_discount);
     });
-    topDeals.reverse()
-    resolve(topDeals)
+    allDeals.reverse()
+    resolve(allDeals)
   })
 }
 
