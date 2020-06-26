@@ -6,7 +6,7 @@ const getPoolConnection = function(dbCreds) {
     user     : dbCreds.db_user,
     password : dbCreds.db_password,
     database : dbCreds.db_name,
-    connectionLimit: 10,
+    connectionLimit: 3,
     connectTimeout  : 60 * 60 * 1000,
     acquireTimeout  : 60 * 60 * 1000,
     timeout         : 60 * 60 * 1000

@@ -1,11 +1,13 @@
 const getPrices = require('./getPrices')
 
-module.exports.handler = async function (event, context, callback) {
+const test = async function (event, context, callback) {
   try {
-    await getPrices.getItemPrices()
-    callback(null, "All scraped")
+    const scraper = await getPrices.getItemPrices()
+    console.log(scraper)
+    callback(null, scraper)
   }
   catch(err) {
     console.log(err)
   }
 }
+test()

@@ -36,9 +36,7 @@ const getDbConnection = (dbCreds) => {
 //   })
 // }
 
-const getItems = async (dbCreds) => {
-  const pool = getDbConnection(dbCreds)
-
+const getItems = async (pool) => {
   return new Promise(function(resolve, reject) {
     pool.getConnection(function(err, connection) {
       if (err) {
@@ -51,16 +49,15 @@ const getItems = async (dbCreds) => {
         }
         connection.release()
         if(!err) {
-          pool.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
+          resolve(JSON.stringify(results))
+          // pool.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
         } 
       })
     })
   })
 }
 
-const insertItemDetails = async (dbCreds, store, itemId, price, stockStatus, onSale, priceDifference) => {
-  const pool = getDbConnection(dbCreds)
-
+const insertItemDetails = async (pool, store, itemId, price, stockStatus, onSale, priceDifference) => {
   const itemDetails = {
     item_id: itemId,
     [`${store}_price`]: price,
@@ -79,8 +76,10 @@ const insertItemDetails = async (dbCreds, store, itemId, price, stockStatus, onS
         if (error){
           console.log(error)
         }
+        connection.release()
         if(!err) {
-          pool.end(error => error ? reject(error) : resolve())
+          resolve()
+          // pool.end(error => error ? reject(error) : resolve())
         } 
       })
     })

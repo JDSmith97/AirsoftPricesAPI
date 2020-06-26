@@ -119,17 +119,21 @@ const getItemPriceBullseyeCountrySport = async (dbConnection) => {
 }
 
 const getItemPrices = async () => {
+  return new Promise(async function(resolve, reject) {
     const dbCreds = await getDbCreds()
-    await getItemPricePatrolBase(dbCreds)
-    // await getItemPriceSurplusStore(dbCreds)
-    await getItemPriceRedwolfAirsoft(dbCreds) 
-    await getItemPriceZeroOneAirsoft(dbCreds)
-    await getItemPriceAirsoftWorld(dbCreds)
-    await getItemPriceLandWarriorAirsoft(dbCreds)
-    await getItemPriceFireSupport(dbCreds)
-    await getItemPriceWolfArmouries(dbCreds)
-    await getItemPriceSkirmshop(dbCreds)
-    await getItemPriceBullseyeCountrySport(dbCreds)
+    const pool = await db.getDbConnection(dbCreds)
+    await getItemPricePatrolBase(pool)
+    // await getItemPriceSurplusStore(pool)
+    await getItemPriceRedwolfAirsoft(pool) 
+    await getItemPriceZeroOneAirsoft(pool)
+    await getItemPriceAirsoftWorld(pool)
+    await getItemPriceLandWarriorAirsoft(pool)
+    await getItemPriceFireSupport(pool)
+    await getItemPriceWolfArmouries(pool)
+    await getItemPriceSkirmshop(pool)
+    await getItemPriceBullseyeCountrySport(pool)
+    resolve("All scraped")
+  })
 }
 
 module.exports = {
