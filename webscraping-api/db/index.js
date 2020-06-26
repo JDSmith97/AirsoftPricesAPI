@@ -1,5 +1,6 @@
 const mysql = require('mysql')
 const fs = require('fs');
+const poolConnection = require('./poolConnection');
 
 const insertPatrolBasePriceSQL = fs.readFileSync(__dirname + '/sql/insertPatrolBasePrice.sql').toString()
 const insertSurplusStorePriceSQL = fs.readFileSync(__dirname + '/sql/insertSurplusStorePrice.sql').toString()
@@ -25,38 +26,41 @@ const pricesSql = {
   "bullseye_country_sport": insertBullseyeCountrySportSQL
 }
 
-const getDbConnection = async (dbCreds) => {
-  const dbConnection = mysql.createConnection({
-    host     : dbCreds.db_host,
-    user     : dbCreds.db_user,
-    password : dbCreds.db_password,
-    database : dbCreds.db_name
-  })
-  dbConnection.connect()
-
-  return dbConnection
+const getDbConnection = (dbCreds) => {
+  return poolConnection.getPoolConnection(dbCreds);
 }
 
-const closeDbConnection = async (dbConnection) => {
-  return new Promise(function(resolve, reject) {
-    dbConnection.end(error => error ? reject(error) : resolve("DB Connection ended"))
-  })
-}
+// const closeDbConnection = async (dbConnection, results) => {
+//   return new Promise(function(resolve, reject) {
+//     dbConnection.end(error => error ? reject(error) : resolve(results))
+//   })
+// }
 
 const getItems = async (dbCreds) => {
-  const dbConnection = await getDbConnection(dbCreds)
+  const pool = getDbConnection(dbCreds)
 
   return new Promise(function(resolve, reject) {
-    dbConnection.query('SELECT * FROM items', function (error, results, fields) {
-      if (error){
-        console.log(error)
+    pool.getConnection(function(err, connection) {
+      if (err) {
+        connection.release();
+        throw err;
       }
-      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
+      connection.query('SELECT * FROM items', function (error, results, fields) {
+        if (error){
+          console.log(error)
+        }
+        connection.release()
+        if(!err) {
+          pool.end(error => error ? reject(error) : resolve(JSON.stringify(results)))
+        } 
+      })
     })
   })
 }
 
 const insertItemDetails = async (dbCreds, store, itemId, price, stockStatus, onSale, priceDifference) => {
+  const pool = getDbConnection(dbCreds)
+
   const itemDetails = {
     item_id: itemId,
     [`${store}_price`]: price,
@@ -65,15 +69,29 @@ const insertItemDetails = async (dbCreds, store, itemId, price, stockStatus, onS
     [`${store}_discount`]: priceDifference
   }
 
-  const dbConnection = await getDbConnection(dbCreds)
-
   return new Promise(function(resolve, reject) {
-    dbConnection.query(pricesSql[store], [itemDetails, itemDetails], function ( error, results ) {
-      if (error){
-        console.log(error)
+    pool.getConnection(function(err, connection) {
+      if (err) {
+        console.log(err)
+        throw err;
       }
+      connection.query(pricesSql[store], [itemDetails, itemDetails], async function(error, results){
+        if (error){
+          console.log(error)
+        }
+        if(!err) {
+          pool.end(error => error ? reject(error) : resolve())
+        } 
+      })
     })
-    dbConnection.end(error => error ? reject(error) : resolve("DB Connection ended"))
+    // pool.query(pricesSql[store], [itemDetails, itemDetails], async function ( error, results ) {
+    //     console.log(results)
+    //     if (error){
+    //       console.log(error)
+    //     }
+    // })
+    // pool.releaseConnection()
+    // pool.end(error => error ? reject(error) : resolve())
   })
 }
 
@@ -129,6 +147,5 @@ module.exports = {
   insertItemsFireSupport,
   insertItemsWolfArmouries,
   insertItemsSkirmshop,
-  insertItemsBullseyeCountrySport,
-  closeDbConnection
+  insertItemsBullseyeCountrySport
 }

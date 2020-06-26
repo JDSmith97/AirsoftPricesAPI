@@ -20,11 +20,6 @@ const getDbCreds = async () => {
   return dbCreds
 }
 
-const getDbConnection = async (dbCreds) => {
-  const dbConnection = await db.getDbConnection(dbCreds)
-  return dbConnection
-}
-
 const webscrappers = {
   "patrolbase": {
     webscrapper: patrolBase,
