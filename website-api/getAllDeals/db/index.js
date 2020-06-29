@@ -43,14 +43,23 @@ const dealsSql = {
   "bullseye_country_sport": getBullseyeDealsSql
 }
 
-const getItemDeals = (dbConnection, store) => {
+const getItemDeals = (dbConnection, store, category) => {
   return new Promise(function(resolve, reject) {
-    dbConnection.query(dealsSql[store], function (error, results, fields) {
-      if (error){
-        console.log(error)
-      }
-      resolve(JSON.stringify(results))
-    })
+    if(category == 'none'){ 
+      dbConnection.query(dealsSql[store], '%', function (error, results, fields) {
+        if (error){
+          console.log(error)
+        }
+        resolve(JSON.stringify(results))
+      })
+    } else {
+      dbConnection.query(dealsSql[store], category, function (error, results, fields) {
+        if (error){
+          console.log(error)
+        }
+        resolve(JSON.stringify(results))
+      })
+    }
   })
 }
 
@@ -70,8 +79,8 @@ const getLandWarriorDeals = async (dbConnection) => {
   return getItemDeals(dbConnection, "land_warrior_airsoft")
 }
 
-const getPatrolBaseDeals = async (dbConnection) => {
-  return getItemDeals(dbConnection, "patrol_base")
+const getPatrolBaseDeals = async (dbConnection, category) => {
+  return getItemDeals(dbConnection, "patrol_base", category)
 }
 
 const getRedwolfAirsoftDeals = async (dbConnection) => {
@@ -94,7 +103,7 @@ const getZeroOneDeals = async (dbConnection) => {
   return getItemDeals(dbConnection, "zero_one_airsoft")
 }
 
-const getDeals = async (dbConnection) => {
+const getDeals = async (dbConnection, limit, offset, category) => {
   return new Promise(async function(resolve, reject) {
     let allDeals = []
     const allDealsPush = (deal, store) => {
@@ -107,52 +116,53 @@ const getDeals = async (dbConnection) => {
         store: store
       })
     }
-    const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
-    JSON.parse(airsoftWorld).forEach(deal => {
-      allDealsPush(deal, 'AirsoftWorld')
-    })
-    const bullseye = await getBullseyeDeals(dbConnection)
-    JSON.parse(bullseye).forEach(deal => {
-      allDealsPush(deal, 'BullseyeCountrySport')
-    })
-    const fireSupport = await getFireSupportDeals(dbConnection)
-    JSON.parse(fireSupport).forEach(deal => {
-      allDealsPush(deal, 'FireSupport')
-    })
-    const landWarrior = await getLandWarriorDeals(dbConnection)
-    JSON.parse(landWarrior).forEach(deal => {
-      allDealsPush(deal, 'LandWarrior')
-    })
-    const patrolBase = await getPatrolBaseDeals(dbConnection)
+    // const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
+    // JSON.parse(airsoftWorld).forEach(deal => {
+    //   allDealsPush(deal, 'AirsoftWorld')
+    // })
+    // const bullseye = await getBullseyeDeals(dbConnection)
+    // JSON.parse(bullseye).forEach(deal => {
+    //   allDealsPush(deal, 'BullseyeCountrySport')
+    // })
+    // const fireSupport = await getFireSupportDeals(dbConnection)
+    // JSON.parse(fireSupport).forEach(deal => {
+    //   allDealsPush(deal, 'FireSupport')
+    // })
+    // const landWarrior = await getLandWarriorDeals(dbConnection)
+    // JSON.parse(landWarrior).forEach(deal => {
+    //   allDealsPush(deal, 'LandWarrior')
+    // })
+    const patrolBase = await getPatrolBaseDeals(dbConnection, category)
     JSON.parse(patrolBase).forEach(deal => {
       allDealsPush(deal, 'PatrolBase')
     })
-    const redwolfAirsoft = await getRedwolfAirsoftDeals(dbConnection)
-    JSON.parse(redwolfAirsoft).forEach(deal => {
-      allDealsPush(deal, 'RedwolfAirsoft')
-    })
-    const skirmshop = await getSkirmshopDeals(dbConnection)
-    JSON.parse(skirmshop).forEach(deal => {
-      allDealsPush(deal, 'Skirmshop')
-    })
-    const surplus = await getSurplusDeals(dbConnection)
-    JSON.parse(surplus).forEach(deal => {
-      allDealsPush(deal, 'Surplus')
-    })
-    const wolfArmouries = await getWolfArmouriesDeals(dbConnection)
-    JSON.parse(wolfArmouries).forEach(deal => {
-      allDealsPush(deal, 'WolfArmouries')
-    })
-    const zeroOne = await getZeroOneDeals(dbConnection)
-    JSON.parse(zeroOne).forEach(deal => {
-      allDealsPush(deal, 'ZeroOne')
-    })
+    // const redwolfAirsoft = await getRedwolfAirsoftDeals(dbConnection)
+    // JSON.parse(redwolfAirsoft).forEach(deal => {
+    //   allDealsPush(deal, 'RedwolfAirsoft')
+    // })
+    // const skirmshop = await getSkirmshopDeals(dbConnection)
+    // JSON.parse(skirmshop).forEach(deal => {
+    //   allDealsPush(deal, 'Skirmshop')
+    // })
+    // const surplus = await getSurplusDeals(dbConnection)
+    // JSON.parse(surplus).forEach(deal => {
+    //   allDealsPush(deal, 'Surplus')
+    // })
+    // const wolfArmouries = await getWolfArmouriesDeals(dbConnection)
+    // JSON.parse(wolfArmouries).forEach(deal => {
+    //   allDealsPush(deal, 'WolfArmouries')
+    // })
+    // const zeroOne = await getZeroOneDeals(dbConnection)
+    // JSON.parse(zeroOne).forEach(deal => {
+    //   allDealsPush(deal, 'ZeroOne')
+    // })
     await closeDbConnection(dbConnection)
     allDeals.sort(function(a, b) {
       return parseFloat(a.item_discount) - parseFloat(b.item_discount);
     });
     allDeals.reverse()
-    resolve(allDeals)
+    const deals = allDeals.slice(offset, offset+limit)
+    resolve(deals)
   })
 }
 

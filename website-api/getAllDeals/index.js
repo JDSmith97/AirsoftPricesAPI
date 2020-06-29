@@ -2,7 +2,15 @@ const getAllDeals = require('./getAllDeals')
 
 module.exports.handler = async function (event, context, callback) {
   try {
-    const items = await getAllDeals.getDeals()
+    let limit = event.queryStringParameters.limit
+    let offset = event.queryStringParameters.offset
+    let category = event.queryStringParameters.category
+
+    if(!category){
+      category = 'none'
+    }
+    
+    const items = await getAllDeals.getDeals(limit, offset, category)
 
     const response = {
       statusCode: 200,
@@ -10,9 +18,9 @@ module.exports.handler = async function (event, context, callback) {
         "Access-Control-Allow-Origin" : "*",
         "Access-Control-Allow-Credentials" : true
       },
-      body: items
+      body: JSON.stringify(items)
     };
-    console.log('response', response)
+
     callback(null, response);
   }
   catch(err) {
