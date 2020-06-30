@@ -11,32 +11,20 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-const getAllItemsFromDB = async (dbConnection) => {
+const getAllItemsFromDB = async (dbConnection, limit, offset, category, manufacturer, getLength) => {
   return new Promise(async function(resolve, reject) {
-    const allItems = await db.getItems(dbConnection)
+    const allItems = await db.getAllItems(dbConnection, limit, offset, category, manufacturer, getLength)
     
-    // console.log(allItems)
-    resolve(JSON.parse(allItems))
+    resolve(allItems)
   })
 }
 
-const getItems = async () => {
+const getItems = async (limit, offset, category, manufacturer, getLength) => {
   const dbCreds = await getDbCreds()
   const dbConnection = await getDbConnection(dbCreds)
-  const items = await getAllItemsFromDB(dbConnection)
+  const items = await getAllItemsFromDB(dbConnection, limit, offset, category, manufacturer, getLength)
 
-  let allItems = []
-
-  items.forEach(item => {
-    let itemFormat = {
-      name: item.item_name,
-      id: item.item_id
-    }
-
-    allItems.push(itemFormat)
-  });
-  console.log(allItems)
-  return allItems
+  return items
 }
 
 module.exports = {

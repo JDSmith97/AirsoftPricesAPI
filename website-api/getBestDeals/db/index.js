@@ -1,5 +1,6 @@
 const mysql = require('mysql')
 const fs = require('fs')
+const currency = require('currency.js')
 
 const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAirsoftWorldDeals.sql').toString()
 const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getBullseyeDeals.sql').toString()
@@ -139,9 +140,12 @@ const getDeals = async (dbConnection) => {
     let topDeals = []
     const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
     const topDealsPush = (deal, store) => {
+      const GBP = value => currency(value, { symbol: "£", precision: 2 });
+      const discount = GBP(deal.item_discount).format(true)
       return  topDeals.push({
         item_id: deal.item_id,
         item_price: deal.item_price,
+        item_discount_currency: discount,
         item_discount: deal.item_discount,
         item_name: deal.item_name,
         item_image: deal.item_image,
