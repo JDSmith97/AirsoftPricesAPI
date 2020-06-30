@@ -2,4 +2,6 @@ SELECT item_prices_fire_support.item_id, fire_support_price AS item_price, fire_
 item_prices_fire_support
 LEFT JOIN items
 ON item_prices_fire_support.item_id = items.item_id
-WHERE fire_support_discount > 0;
+WHERE fire_support_discount > 0
+AND items.item_category LIKE ?
+AND items.item_manufacturer LIKE ?;

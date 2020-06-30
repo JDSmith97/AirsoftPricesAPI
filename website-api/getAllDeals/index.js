@@ -5,12 +5,10 @@ module.exports.handler = async function (event, context, callback) {
     let limit = event.queryStringParameters.limit
     let offset = event.queryStringParameters.offset
     let category = event.queryStringParameters.category
-
-    if(!category){
-      category = 'none'
-    }
+    let manufacturer = event.queryStringParameters.manufacturer
+    let getLength = event.queryStringParameters.getLength
     
-    const items = await getAllDeals.getDeals(limit, offset, category)
+    const items = await getAllDeals.getDeals(limit, offset, category, manufacturer, getLength)
 
     const response = {
       statusCode: 200,

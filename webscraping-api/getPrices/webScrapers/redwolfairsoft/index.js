@@ -3,7 +3,7 @@ const cheerio = require('cheerio')
 
 const getItemPrice = async (productUrl) => {
     return new Promise(function(resolve, reject) {
-        const redwolfAirsoftUrl = 'http://uk.redwolfairsoft.com/'
+        const redwolfAirsoftUrl = 'https://uk.redwolfairsoft.com/'
         const url = redwolfAirsoftUrl + productUrl
 
         axios.get(url)

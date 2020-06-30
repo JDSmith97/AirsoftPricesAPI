@@ -2,4 +2,6 @@ SELECT item_prices_surplus_store.item_id, surplus_store_price AS item_price, sur
 item_prices_surplus_store
 LEFT JOIN items
 ON item_prices_surplus_store.item_id = items.item_id
-WHERE surplus_store_discount > 0;
+WHERE surplus_store_discount > 0
+AND items.item_category LIKE ?
+AND items.item_manufacturer LIKE ?;

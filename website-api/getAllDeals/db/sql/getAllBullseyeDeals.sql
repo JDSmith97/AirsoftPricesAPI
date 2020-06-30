@@ -2,4 +2,6 @@ SELECT item_prices_bullseye_country_sport.item_id, bullseye_country_sport_price 
 item_prices_bullseye_country_sport
 LEFT JOIN items
 ON item_prices_bullseye_country_sport.item_id = items.item_id
-WHERE bullseye_country_sport_discount > 0;
+WHERE bullseye_country_sport_discount > 0
+AND items.item_category LIKE ?
+AND items.item_manufacturer LIKE ?;

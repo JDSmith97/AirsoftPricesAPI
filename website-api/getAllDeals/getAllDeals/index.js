@@ -11,18 +11,18 @@ const getDbConnection = async (dbCreds) => {
   return dbConnection
 }
 
-const getAllDealsFromDB = async (dbConnection, limit, offset, category) => {
+const getAllDealsFromDB = async (dbConnection, limit, offset, category, manufacturer, getLength) => {
   return new Promise(async function(resolve, reject) {
-    const allItems = await db.getDeals(dbConnection, limit, offset, category)
+    const allItems = await db.getDeals(dbConnection, limit, offset, category, manufacturer, getLength)
     
     resolve(allItems)
   })
 }
 
-const getDeals = async (limit, offset, category) => {
+const getDeals = async (limit, offset, category, manufacturer, getLength) => {
   const dbCreds = await getDbCreds()
   const dbConnection = await getDbConnection(dbCreds)
-  const items = await getAllDealsFromDB(dbConnection, limit, offset, category)
+  const items = await getAllDealsFromDB(dbConnection, limit, offset, category, manufacturer, getLength)
 
   return items
 }

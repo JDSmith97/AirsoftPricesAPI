@@ -2,4 +2,6 @@ SELECT item_prices_redwolf_airsoft.item_id, redwolf_airsoft_price AS item_price,
 item_prices_redwolf_airsoft
 LEFT JOIN items
 ON item_prices_redwolf_airsoft.item_id = items.item_id
-WHERE redwolf_airsoft_discount > 0;
+WHERE redwolf_airsoft_discount > 0
+AND items.item_category LIKE ?
+AND items.item_manufacturer LIKE ?;
