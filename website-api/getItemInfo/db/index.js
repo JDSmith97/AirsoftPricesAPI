@@ -69,13 +69,13 @@ const getItemPrices = async (dbConnection, id) => {
           item_price_currency: item[`${store}_price`],
           item_stock: item[`${store}_stock`],
           item_on_sale: item[`${store}_sale`],
-          item_discount: discount
+          item_discount: discount,
+          item_url: item[storeURL]
       })
     }
   })
   storeData.sort((a, b) => parseFloat(a.item_price) - parseFloat(b.item_price));
   itemData[0].item.airsoft_stores.push(storeData)
-  // console.log(itemData[0].item.airsoft_stores[0])
   return itemData[0]
 }
 
