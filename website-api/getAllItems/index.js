@@ -9,7 +9,6 @@ module.exports.handler = async function (event, context, callback) {
     let getLength = event.queryStringParameters.getLength
     
     const items = await getAllItems.getItems(limit, offset, category, manufacturer, getLength)
-    console.log(items)
     const response = {
       statusCode: 200,
       headers: {

@@ -13,10 +13,9 @@ const getDbConnection = async (dbCreds) => {
 
 const getAllItemPrices = async (dbConnection, id) => {
   return new Promise(async function(resolve, reject) {
-    const allItems = await db.getItemPrices(dbConnection, id)
+    const itemPrices = await db.getItemPrices(dbConnection, id)
     
-    console.log(allItems)
-    resolve(JSON.parse(allItems))
+    resolve(itemPrices)
   })
 }
 
