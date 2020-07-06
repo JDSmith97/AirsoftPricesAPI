@@ -151,8 +151,8 @@ const getAllItems = async (dbConnection, limit, offset, category, manufacturer, 
     })
     await closeDbConnection(dbConnection)
     allItems.sort(function (a, b) {
-      return a.item_name.localeCompare(b.item_name);
-    });
+      return a.item_name.localeCompare(b.item_name)
+    })
     if(getLength){
       resolve(allItems.length)
     } if(!limit){

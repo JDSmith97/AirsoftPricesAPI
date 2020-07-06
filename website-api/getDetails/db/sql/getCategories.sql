@@ -1,0 +1,1 @@
+SELECT DISTINCT item_category FROM items

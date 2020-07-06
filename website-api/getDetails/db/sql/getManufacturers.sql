@@ -1,0 +1,1 @@
+SELECT DISTINCT item_manufacturer FROM items
