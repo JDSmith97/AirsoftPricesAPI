@@ -1,5 +1,6 @@
 const mysql = require('mysql')
 const fs = require('fs')
+const { Convert } = require("easy-currencies");
 const currency = require('currency.js')
 
 const getItemPricesSql = fs.readFileSync(__dirname + '/sql/getItemPrices.sql').toString()
@@ -35,11 +36,10 @@ const getItemData = async (dbConnection, id) => {
       if (error){
         console.log(error)
       }
-      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results[0])));
+      dbConnection.end(error => error ? reject(error) : resolve(JSON.stringify(results[0])))
     })
   })
 }
-
 
 const getItemPrices = async (dbConnection, id) => {
   let itemData = []
@@ -56,25 +56,77 @@ const getItemPrices = async (dbConnection, id) => {
     }
   })
 
-  stores.forEach(store => {
+  for(const store of stores) {
     let storeURL = store.replace(/_/g,"") + "_url"
 
-    const GBP = value => currency(value, { symbol: "£", precision: 2 });
-    const discount = GBP(item[`${store}_discount`]).format(true)
+    const GBP = value => currency(value, { symbol: "£", precision: 2 })
+    const EUR = value => currency(value, { symbol: "€", precision: 2 })
 
-    if(item[storeURL]){
-      storeData.push({
-          store,
-          item_price: item[`${store}_price`].replace('£',''),
-          item_price_currency: item[`${store}_price`],
-          item_stock: item[`${store}_stock`],
-          item_on_sale: item[`${store}_sale`],
-          item_discount: discount,
-          item_url: item[storeURL]
-      })
+    if(item[`${store}_price`]) {
+      if(item[`${store}_price`].includes('£')){
+        const discountGBP = GBP(item[`${store}_discount`]).format(true)
+
+        const discountValue = await Convert(item[`${store}_discount`])
+          .from("GBP")
+          .to("EUR")
+
+        const discountEUR = EUR(discountValue).format(true)
+
+        const valueEUR = await Convert(item[`${store}_price`].replace('£',''))
+          .from("GBP")
+          .to("EUR")
+
+        const itemPriceEUR = EUR(valueEUR).format(true)
+
+        if(item[storeURL]){
+          storeData.push({
+              store,
+              item_price: item[`${store}_price`].replace('£',''),
+              item_price_gbp: item[`${store}_price`],
+              item_price_eur: itemPriceEUR,
+              item_stock: item[`${store}_stock`],
+              item_on_sale: item[`${store}_sale`],
+              item_discount_gbp: discountGBP,
+              item_discount_eur: discountEUR,
+              item_url: item[storeURL],
+              item_currency: 'GBP'
+          })
+        }
+      }
+
+      if(item[`${store}_price`].includes('€')){
+        const discountEUR = EUR(item[`${store}_discount`]).format(true)
+
+        const discountValue = await Convert(item[`${store}_discount`])
+          .from("EUR")
+          .to("GBP")
+
+        const discountGBP = GBP(discountValue).format(true)
+
+        const valueGBP = await Convert(item[`${store}_price`].replace('€',''))
+          .from("EUR")
+          .to("GBP")
+        
+        const itemPriceGBP = GBP(valueGBP).format(true)
+
+        if(item[storeURL]){
+          storeData.push({
+              store,
+              item_price: item[`${store}_price`].replace('£',''),
+              item_price_gbp: itemPriceGBP,
+              item_price_eur: item[`${store}_price`],
+              item_stock: item[`${store}_stock`],
+              item_on_sale: item[`${store}_sale`],
+              item_discount_gbp: discountGBP,
+              item_discount_eur: discountEUR,
+              item_url: item[storeURL],
+              item_currency: 'EUR'
+          })
+        }
+      }
     }
-  })
-  storeData.sort((a, b) => parseFloat(a.item_price) - parseFloat(b.item_price));
+  }
+  storeData.sort((a, b) => parseFloat(a.item_price) - parseFloat(b.item_price))
   itemData[0].item.airsoft_stores.push(storeData)
   return itemData[0]
 }
