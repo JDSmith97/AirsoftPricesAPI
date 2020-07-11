@@ -160,10 +160,6 @@ const getDeals = async (dbConnection) => {
 
         const priceEUR = EUR(priceValue).format(true)
 
-        // await Promise.all([discountValue, priceValue]).then((values) => {
-        //   const discountEUR = EUR(values[0]).format(true)
-        //   const priceEUR = EUR(values[1]).format(true)
-
         return topDeals.push({
           item_id: deal.item_id,
           item_price_gbp: deal.item_price,
@@ -198,17 +194,13 @@ const getDeals = async (dbConnection) => {
         
         discountInGBP = discountInGBP.toFixed(2)
 
-        await Promise.all([discountValue, priceValue, priceGBP]).then((values) => {
-          console.log(values)
-        })
-
         return topDeals.push({
           item_id: deal.item_id,
           item_price_gbp: priceGBP,
           item_price_eur: deal.item_price,
           item_discount_gbp: discountGBP,
           item_discount_eur: discount,
-          item_discount: discountInGBP,
+          item_discount: parseFloat(discountInGBP),
           item_name: deal.item_name,
           item_image: deal.item_image,
           store: store
