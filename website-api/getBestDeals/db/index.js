@@ -1,6 +1,7 @@
 const mysql = require('mysql')
 const fs = require('fs')
 const currency = require('currency.js')
+const { Convert } = require("easy-currencies")
 
 const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAirsoftWorldDeals.sql').toString()
 const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getBullseyeDeals.sql').toString()
@@ -139,63 +140,126 @@ const getDeals = async (dbConnection) => {
   return new Promise(async function(resolve, reject) {
     let topDeals = []
     const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
-    const topDealsPush = (deal, store) => {
-      const GBP = value => currency(value, { symbol: "£", precision: 2 });
-      const discount = GBP(deal.item_discount).format(true)
-      return  topDeals.push({
-        item_id: deal.item_id,
-        item_price: deal.item_price,
-        item_discount_currency: discount,
-        item_discount: deal.item_discount,
-        item_name: deal.item_name,
-        item_image: deal.item_image,
-        store: store
-      })
+
+    const GBP = value => currency(value, { symbol: "£", precision: 2 })
+    const EUR = value => currency(value, { symbol: "€", precision: 2 });
+
+    const topDealsPush = async (deal, store) => {
+      if(deal.item_price.includes('£')){
+        const discount = GBP(deal.item_discount).format(true)
+
+        const discountValue = await Convert(deal.item_discount)
+          .from("GBP")
+          .to("EUR")
+
+        const discountEUR = EUR(discountValue).format(true)
+
+        const priceValue = await Convert(deal.item_price.replace('£',''))
+          .from("GBP")
+          .to("EUR")
+
+        const priceEUR = EUR(priceValue).format(true)
+
+        // await Promise.all([discountValue, priceValue]).then((values) => {
+        //   const discountEUR = EUR(values[0]).format(true)
+        //   const priceEUR = EUR(values[1]).format(true)
+
+        return topDeals.push({
+          item_id: deal.item_id,
+          item_price_gbp: deal.item_price,
+          item_price_eur: priceEUR,
+          item_discount_gbp: discount,
+          item_discount_eur: discountEUR,
+          item_discount: deal.item_discount,
+          item_name: deal.item_name,
+          item_image: deal.item_image,
+          store: store
+        })
+      }
+
+      if(deal.item_price.includes('€')){
+        const discount = EUR(deal.item_discount).format(true)
+
+        const discountValue = await Convert(deal.item_discount)
+          .from("EUR")
+          .to("GBP")
+
+        const discountGBP = GBP(discountValue).format(true)
+
+        const priceValue = await Convert(deal.item_price.replace('€',''))
+          .from("EUR")
+          .to("GBP")
+
+        const priceGBP = GBP(priceValue).format(true)
+
+        let discountInGBP = await Convert(deal.item_discount)
+          .from("EUR")
+          .to("GBP")
+        
+        discountInGBP = discountInGBP.toFixed(2)
+
+        await Promise.all([discountValue, priceValue, priceGBP]).then((values) => {
+          console.log(values)
+        })
+
+        return topDeals.push({
+          item_id: deal.item_id,
+          item_price_gbp: priceGBP,
+          item_price_eur: deal.item_price,
+          item_discount_gbp: discountGBP,
+          item_discount_eur: discount,
+          item_discount: discountInGBP,
+          item_name: deal.item_name,
+          item_image: deal.item_image,
+          store: store
+        })
+      }
     }
-    JSON.parse(airsoftWorld).forEach(deal => {
-      topDealsPush(deal, 'AirsoftWorld')
-    })
+
+    for(const deal of JSON.parse(airsoftWorld)) {
+      await topDealsPush(deal, 'AirsoftWorld')
+    }
     const bullseye = await getBullseyeDeals(dbConnection)
-    JSON.parse(bullseye).forEach(deal => {
-      topDealsPush(deal, 'BullseyeCountrySport')
-    })
+    for(const deal of JSON.parse(bullseye)) {
+      await topDealsPush(deal, 'BullseyeCountrySport')
+    }
     const fireSupport = await getFireSupportDeals(dbConnection)
-    JSON.parse(fireSupport).forEach(deal => {
-      topDealsPush(deal, 'FireSupport')
-    })
+    for(const deal of JSON.parse(fireSupport)) {
+      await topDealsPush(deal, 'FireSupport')
+    }
     const landWarrior = await getLandWarriorDeals(dbConnection)
-    JSON.parse(landWarrior).forEach(deal => {
-      topDealsPush(deal, 'LandWarrior')
-    })
+    for(const deal of JSON.parse(landWarrior)) {
+      await topDealsPush(deal, 'LandWarrior')
+    }
     const patrolBase = await getPatrolBaseDeals(dbConnection)
-    JSON.parse(patrolBase).forEach(deal => {
-      topDealsPush(deal, 'PatrolBase')
-    })
+    for(const deal of JSON.parse(patrolBase)) {
+      await topDealsPush(deal, 'PatrolBase')
+    }
     const redwolfAirsoft = await getRedwolfAirsoftDeals(dbConnection)
-    JSON.parse(redwolfAirsoft).forEach(deal => {
-      topDealsPush(deal, 'RedwolfAirsoft')
-    })
+    for(const deal of JSON.parse(redwolfAirsoft)) {
+      await topDealsPush(deal, 'RedwolfAirsoft')
+    }
     const skirmshop = await getSkirmshopDeals(dbConnection)
-    JSON.parse(skirmshop).forEach(deal => {
-      topDealsPush(deal, 'Skirmshop')
-    })
+    for(const deal of JSON.parse(skirmshop)) {
+      await topDealsPush(deal, 'Skirmshop')
+    }
     const surplus = await getSurplusDeals(dbConnection)
-    JSON.parse(surplus).forEach(deal => {
-      topDealsPush(deal, 'Surplus')
-    })
+    for(const deal of JSON.parse(surplus)) {
+      await topDealsPush(deal, 'Surplus')
+    }
     const wolfArmouries = await getWolfArmouriesDeals(dbConnection)
-    JSON.parse(wolfArmouries).forEach(deal => {
-      topDealsPush(deal, 'WolfArmouries')
-    })
+    for(const deal of JSON.parse(wolfArmouries)) {
+      await topDealsPush(deal, 'WolfArmouries')
+    }
     const zeroOne = await getZeroOneDeals(dbConnection)
-    JSON.parse(zeroOne).forEach(deal => {
-      topDealsPush(deal, 'ZeroOne')
-    })
+    for(const deal of JSON.parse(zeroOne)) {
+      await topDealsPush(deal, 'ZeroOne')
+    }
     topDeals.sort(function(a, b) {
-      return parseFloat(a.item_discount) - parseFloat(b.item_discount);
+      return parseFloat(a.item_discount) - parseFloat(b.item_discount)
     });
     topDeals.reverse()
-    resolve(topDeals.slice(0, 3))
+    resolve(topDeals.slice(0,3))
   })
 }
 

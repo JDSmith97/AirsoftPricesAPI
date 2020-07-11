@@ -1,6 +1,6 @@
 const mysql = require('mysql')
 const fs = require('fs')
-const { Convert } = require("easy-currencies");
+const { Convert } = require("easy-currencies")
 const currency = require('currency.js')
 
 const getItemPricesSql = fs.readFileSync(__dirname + '/sql/getItemPrices.sql').toString()

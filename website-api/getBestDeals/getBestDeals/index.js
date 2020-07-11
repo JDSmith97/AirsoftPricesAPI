@@ -15,7 +15,6 @@ const getBestDealsFromDB = async (dbConnection) => {
   return new Promise(async function(resolve, reject) {
     const allItems = await db.getDeals(dbConnection)
     
-    console.log(allItems)
     resolve(allItems)
   })
 }
