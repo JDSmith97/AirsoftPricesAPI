@@ -1,7 +1,9 @@
 const mysql = require('mysql')
 const fs = require('fs')
 const currency = require('currency.js')
-const { Convert } = require("easy-currencies")
+var AWS = require('aws-sdk')
+AWS.config.update({region: 'eu-west-2'})
+var ddb = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'})
 
 const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAirsoftWorldDeals.sql').toString()
 const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getBullseyeDeals.sql').toString()
@@ -24,6 +26,36 @@ const getDbConnection = async (dbCreds) => {
   dbConnection.connect()
 
   return dbConnection
+}
+
+const getExchangeRates = async () => {
+  return new Promise(function(resolve, reject) {
+    const exchangeRates = []
+    const tableName = 'airsoftPrices-exchangeRates'
+
+    var EURtoGBP = {
+      RequestItems: {
+        'airsoftPrices-exchangeRates': {
+          Keys: [
+            {
+              'currency': 'EURtoGBP'
+            },
+            {
+              'currency': 'GBPtoEUR'
+            }
+          ]
+        }
+      }
+    }
+
+    ddb.batchGet(EURtoGBP, function(err, data) {
+      if (err) {
+        console.log("Error", err);
+      } else {
+        resolve(data.Responses[tableName])
+      }
+    })
+  })
 }
 
 const getAirsoftWorldDeals = async (dbConnection) => {
@@ -141,6 +173,8 @@ const getDeals = async (dbConnection) => {
     let topDeals = []
     const airsoftWorld = await getAirsoftWorldDeals(dbConnection)
 
+    const exchangeRates = await getExchangeRates()
+
     const GBP = value => currency(value, { symbol: "£", precision: 2 })
     const EUR = value => currency(value, { symbol: "€", precision: 2 });
 
@@ -148,15 +182,11 @@ const getDeals = async (dbConnection) => {
       if(deal.item_price.includes('£')){
         const discount = GBP(deal.item_discount).format(true)
 
-        const discountValue = await Convert(deal.item_discount)
-          .from("GBP")
-          .to("EUR")
+        const discountValue = deal.item_discount * exchangeRates[1].rate
 
         const discountEUR = EUR(discountValue).format(true)
 
-        const priceValue = await Convert(deal.item_price.replace('£',''))
-          .from("GBP")
-          .to("EUR")
+        const priceValue = deal.item_price.replace('£','') * exchangeRates[1].rate
 
         const priceEUR = EUR(priceValue).format(true)
 
@@ -176,21 +206,15 @@ const getDeals = async (dbConnection) => {
       if(deal.item_price.includes('€')){
         const discount = EUR(deal.item_discount).format(true)
 
-        const discountValue = await Convert(deal.item_discount)
-          .from("EUR")
-          .to("GBP")
+        const discountValue = deal.item_discount * exchangeRates[0].rate
 
         const discountGBP = GBP(discountValue).format(true)
 
-        const priceValue = await Convert(deal.item_price.replace('€',''))
-          .from("EUR")
-          .to("GBP")
+        const priceValue = deal.item_price.replace('€','') * exchangeRates[0].rate
 
         const priceGBP = GBP(priceValue).format(true)
 
-        let discountInGBP = await Convert(deal.item_discount)
-          .from("EUR")
-          .to("GBP")
+        let discountInGBP = deal.item_discount * exchangeRates[0].rate
         
         discountInGBP = discountInGBP.toFixed(2)
 
@@ -200,7 +224,7 @@ const getDeals = async (dbConnection) => {
           item_price_eur: deal.item_price,
           item_discount_gbp: discountGBP,
           item_discount_eur: discount,
-          item_discount: parseFloat(discountInGBP),
+          item_discount: discountInGBP,
           item_name: deal.item_name,
           item_image: deal.item_image,
           store: store
