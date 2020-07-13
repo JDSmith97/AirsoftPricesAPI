@@ -1,6 +1,9 @@
 const mysql = require('mysql')
 const fs = require('fs')
 const currency = require('currency.js')
+const AWS = require('aws-sdk')
+AWS.config.update({region: 'eu-west-2'})
+const ddb = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'})
 
 const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAllAirsoftWorldDeals.sql').toString()
 const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getAllBullseyeDeals.sql').toString()
@@ -28,6 +31,45 @@ const getDbConnection = async (dbCreds) => {
 const closeDbConnection = async (dbConnection) => {
   return new Promise(function(resolve, reject) {
     dbConnection.end(error => error ? reject(error) : resolve("DB Connection ended"))
+  })
+}
+
+const getExchangeRates = async () => {
+  return new Promise(async function(resolve, reject) {
+    const EURtoGBPRate = []
+    const GBPtoEURRate = []
+
+    const EURtoGBP = {
+      TableName: 'airsoftPrices-exchangeRates', 
+      Key: {
+        'currency': 'EURtoGBP'
+      }
+    }
+
+    const GBPtoEUR = {
+      TableName: 'airsoftPrices-exchangeRates', 
+      Key: {
+        'currency': 'GBPtoEUR'
+      }
+    }
+
+    try {
+      const GBPData = await ddb.get(EURtoGBP).promise()
+      EURtoGBPRate.push(GBPData)
+
+    } catch (err) {
+      console.log("Failure", err.message)
+    }
+
+    try {
+      const EURData = await ddb.get(GBPtoEUR).promise()
+      GBPtoEURRate.push(EURData)
+      
+    } catch (err) {
+      console.log("Failure", err.message)
+    }
+
+    resolve([EURtoGBPRate, GBPtoEURRate])
   })
 }
 
@@ -121,19 +163,62 @@ const getZeroOneDeals = async (dbConnection, category, manufacturer) => {
 const getDeals = async (dbConnection, limit, offset, category, manufacturer, getLength) => {
   return new Promise(async function(resolve, reject) {
     let allDeals = []
+    
+    const exchangeRates = await getExchangeRates()
+
     const allDealsPush = (deal, store) => {
-      const GBP = value => currency(value, { symbol: "£", precision: 2 });
-      const discount = GBP(deal.item_discount).format(true)
-      return  allDeals.push({
-        item_id: deal.item_id,
-        item_price: deal.item_price,
-        item_discount_currency: discount,
-        item_discount: deal.item_discount,
-        item_name: deal.item_name,
-        item_image: deal.item_image,
-        store: store
-      })
+
+      const GBP = value => currency(value, { symbol: "£", precision: 2 })
+      const EUR = value => currency(value, { symbol: "€", precision: 2 })
+
+      if(deal.item_price.includes('£')){
+        const discount = GBP(deal.item_discount).format(true)
+
+        const discountValue = deal.item_discount * exchangeRates[1][0].Item.rate
+        const discountEUR = EUR(discountValue).format(true)
+
+        const priceValue = deal.item_price.replace('£','') * exchangeRates[1][0].Item.rate
+        const priceEUR = EUR(priceValue).format(true)
+
+        return  allDeals.push({
+          item_id: deal.item_id,
+          item_price_gbp: deal.item_price,
+          item_price_eur: priceEUR,
+          item_discount_gbp: discount,
+          item_discount_eur: discountEUR,
+          item_discount: deal.item_discount,
+          item_name: deal.item_name,
+          item_image: deal.item_image,
+          store: store
+        })
+      }
+
+      if(deal.item_price.includes('€')){
+        const discount = EUR(deal.item_discount).format(true)
+
+        const discountValue = deal.item_discount * exchangeRates[0][0].Item.rate
+        const discountGBP = GBP(discountValue).format(true)
+
+        const priceValue = deal.item_price.replace('€','') * exchangeRates[0][0].Item.rate
+        const priceGBP = GBP(priceValue).format(true)
+
+        let discountInGBP = discountValue
+        discountInGBP = parseFloat(discountInGBP.toFixed(2))
+
+        return  allDeals.push({
+          item_id: deal.item_id,
+          item_price_gbp: priceGBP,
+          item_price_eur: deal.item_price,
+          item_discount_gbp: discountGBP,
+          item_discount_eur: discount,
+          item_discount: discountInGBP,
+          item_name: deal.item_name,
+          item_image: deal.item_image,
+          store: store
+        })
+      }
     }
+
     const airsoftWorld = await getAirsoftWorldDeals(dbConnection, category, manufacturer)
     JSON.parse(airsoftWorld).forEach(deal => {
       allDealsPush(deal, 'AirsoftWorld')

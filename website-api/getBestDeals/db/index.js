@@ -1,9 +1,9 @@
 const mysql = require('mysql')
 const fs = require('fs')
 const currency = require('currency.js')
-var AWS = require('aws-sdk')
+const AWS = require('aws-sdk')
 AWS.config.update({region: 'eu-west-2'})
-var ddb = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'})
+const ddb = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'})
 
 const getAirsoftWorldDealsSql = fs.readFileSync(__dirname + '/sql/getAirsoftWorldDeals.sql').toString()
 const getBullseyeDealsSql = fs.readFileSync(__dirname + '/sql/getBullseyeDeals.sql').toString()
@@ -29,32 +29,41 @@ const getDbConnection = async (dbCreds) => {
 }
 
 const getExchangeRates = async () => {
-  return new Promise(function(resolve, reject) {
-    const exchangeRates = []
-    const tableName = 'airsoftPrices-exchangeRates'
+  return new Promise(async function(resolve, reject) {
+    const EURtoGBPRate = []
+    const GBPtoEURRate = []
 
-    var EURtoGBP = {
-      RequestItems: {
-        'airsoftPrices-exchangeRates': {
-          Keys: [
-            {
-              'currency': 'EURtoGBP'
-            },
-            {
-              'currency': 'GBPtoEUR'
-            }
-          ]
-        }
+    const EURtoGBP = {
+      TableName: 'airsoftPrices-exchangeRates', 
+      Key: {
+        'currency': 'EURtoGBP'
       }
     }
 
-    ddb.batchGet(EURtoGBP, function(err, data) {
-      if (err) {
-        console.log("Error", err);
-      } else {
-        resolve(data.Responses[tableName])
+    const GBPtoEUR = {
+      TableName: 'airsoftPrices-exchangeRates', 
+      Key: {
+        'currency': 'GBPtoEUR'
       }
-    })
+    }
+
+    try {
+      const GBPData = await ddb.get(EURtoGBP).promise()
+      EURtoGBPRate.push(GBPData)
+
+    } catch (err) {
+      console.log("Failure", err.message)
+    }
+
+    try {
+      const EURData = await ddb.get(GBPtoEUR).promise()
+      GBPtoEURRate.push(EURData)
+      
+    } catch (err) {
+      console.log("Failure", err.message)
+    }
+
+    resolve([EURtoGBPRate, GBPtoEURRate])
   })
 }
 
@@ -182,12 +191,10 @@ const getDeals = async (dbConnection) => {
       if(deal.item_price.includes('£')){
         const discount = GBP(deal.item_discount).format(true)
 
-        const discountValue = deal.item_discount * exchangeRates[1].rate
-
+        const discountValue = deal.item_discount * exchangeRates[1][0].Item.rate
         const discountEUR = EUR(discountValue).format(true)
-
-        const priceValue = deal.item_price.replace('£','') * exchangeRates[1].rate
-
+        
+        const priceValue = deal.item_price.replace('£','') * exchangeRates[1][0].Item.rate
         const priceEUR = EUR(priceValue).format(true)
 
         return topDeals.push({
@@ -206,17 +213,14 @@ const getDeals = async (dbConnection) => {
       if(deal.item_price.includes('€')){
         const discount = EUR(deal.item_discount).format(true)
 
-        const discountValue = deal.item_discount * exchangeRates[0].rate
-
+        const discountValue = deal.item_discount * exchangeRates[0][0].Item.rate
         const discountGBP = GBP(discountValue).format(true)
 
-        const priceValue = deal.item_price.replace('€','') * exchangeRates[0].rate
-
+        const priceValue = deal.item_price.replace('€','') * exchangeRates[0][0].Item.rate
         const priceGBP = GBP(priceValue).format(true)
 
-        let discountInGBP = deal.item_discount * exchangeRates[0].rate
-        
-        discountInGBP = discountInGBP.toFixed(2)
+        let discountInGBP = discountValue
+        discountInGBP = parseFloat(discountInGBP.toFixed(2))
 
         return topDeals.push({
           item_id: deal.item_id,

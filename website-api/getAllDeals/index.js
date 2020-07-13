@@ -7,8 +7,6 @@ module.exports.handler = async function (event, context, callback) {
     let category = event.queryStringParameters.category
     let manufacturer = event.queryStringParameters.manufacturer
     let getLength = event.queryStringParameters.getLength
-    
-    console.log(limit, offset, category, manufacturer, getLength)
 
     const items = await getAllDeals.getDeals(limit, offset, category, manufacturer, getLength)
 
