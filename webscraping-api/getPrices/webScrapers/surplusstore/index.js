@@ -7,7 +7,7 @@ const getItemPrice = async (productUrl) => {
         const url = surplusStoreUrl + productUrl
 
         axios.get(url)
-        .then(async response => {
+        .then(async response => new Promise(resolve => {
             const $ = cheerio.load(response.data)
             const itemDetails = [];
             $('div.product-info-price div.price-box.price-final_price span.price-container span.price').each(function(i, element) {
@@ -35,8 +35,11 @@ const getItemPrice = async (productUrl) => {
             if(itemDetails.length < 4) {
                 itemDetails.push('Out of Stock')
             }
-            resolve(itemDetails)
-        })
+            
+            setTimeout(() => {
+                resolve(itemDetails)
+            }, 2000)
+        }))
         .catch(error => {
             console.log(error)
         })  

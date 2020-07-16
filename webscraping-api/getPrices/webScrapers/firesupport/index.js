@@ -16,7 +16,25 @@ const getItemPrice = async (productUrl) => {
 
                 const currentPrice = filtered.split("Price:")
 
-                itemDetails.push(currentPrice[1], 0, 0)
+                
+                itemDetails.push(currentPrice[1])
+            })
+            $('div.showproducttitle h2').each(function(i, element) {
+                const unfiltered = $(this).text()
+                
+                if(unfiltered.includes("WAS")) {
+                
+                    const removeName = unfiltered.split("SAVE")
+                    const removeWas = removeName[1].split("WAS")
+                    const removeNow = removeWas[0].split("NOW")
+
+                    const filteredDiscount = removeNow[0].replace(/[^a-zA-Z0-9]/g, '')
+
+                    itemDetails.push(1, parseFloat(filteredDiscount))
+
+                } else {
+                    itemDetails.push(0, 0)
+                }
             })
             $('div.showstockqty').each(function(i, element) {
                 const stock = $(this).text()
