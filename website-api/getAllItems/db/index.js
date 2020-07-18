@@ -192,7 +192,7 @@ const getAllItems = async (dbConnection, limit, offset, category, manufacturer, 
       const GBP = value => currency(value, { symbol: "£", precision: 2 })
       const EUR = value => currency(value, { symbol: "€", precision: 2 })
 
-      if(bestPrice.price_currency.includes('£')) {
+      if(bestPrice.price_currency && bestPrice.price_currency.includes('£')) {
         const discount = GBP(bestPrice.discount).format(true)
 
         const discountValue = bestPrice.discount * exchangeRates[1][0].Item.rate
@@ -213,7 +213,7 @@ const getAllItems = async (dbConnection, limit, offset, category, manufacturer, 
         })
       }
 
-      if(bestPrice.price_currency.includes('€')) {
+      if(bestPrice.price_currency && bestPrice.price_currency.includes('€')) {
         const discount = EUR(bestPrice.discount).format(true)
 
         const discountValue = bestPrice.discount * exchangeRates[0][0].Item.rate
