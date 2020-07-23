@@ -1,4 +1,4 @@
-const mysql = require("mysql");
+const mysql = require("mysql")
 
 const getPoolConnection = function(dbCreds) {
   const pool = mysql.createPool({
@@ -12,8 +12,8 @@ const getPoolConnection = function(dbCreds) {
     timeout         : 60 * 60 * 1000
   });
   return pool
-};
+}
 
 module.exports = {
   getPoolConnection
-};
+}

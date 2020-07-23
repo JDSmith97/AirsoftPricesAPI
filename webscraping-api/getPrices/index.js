@@ -67,7 +67,7 @@ const insertPrices = async (dbCreds, store) => {
   let items = await db.getItems(dbCreds)
   const data = webscrappers[store]
 
-  JSON.parse(items).forEach(async item => {
+  for(let item of JSON.parse(items)){
     if(item[`${store}_url`] != null) {
       const price = await data.webscrapper.getItemPrice(item[`${store}_url`])
       console.log(store, item.item_id, price)
@@ -75,11 +75,24 @@ const insertPrices = async (dbCreds, store) => {
         await data.price(dbCreds, item.item_id, price)
       }
     }
-  })
+  }
+
+  // JSON.parse(items).forEach(async item => {
+  //   if(item[`${store}_url`] != null) {
+  //     const price = await data.webscrapper.getItemPrice(item[`${store}_url`])
+  //     console.log(store, item.item_id, price)
+  //     if(price.length == 4) {
+  //       await data.price(dbCreds, item.item_id, price)
+  //     }
+  //   }
+  // })
+
+  return ('done')
 }
 
 const getItemPricePatrolBase = async (dbCreds) => {
-  insertPrices(dbCreds, "patrolbase")
+  const insert = await insertPrices(dbCreds, "patrolbase")
+  return insert
 }
 
 const getItemPriceSurplusStore = async (dbConnection) => {
@@ -95,7 +108,8 @@ const getItemPriceZeroOneAirsoft = async (dbConnection) => {
 }
 
 const getItemPriceAirsoftWorld = async (dbConnection) => {
-  insertPrices(dbConnection, "airsoftworld")
+  const insert = await insertPrices(dbConnection, "airsoftworld")
+  return insert
 }
 
 const getItemPriceLandWarriorAirsoft = async (dbConnection) => {
@@ -118,20 +132,30 @@ const getItemPriceBullseyeCountrySport = async (dbConnection) => {
   insertPrices(dbConnection, "bullseyecountrysport")
 }
 
+const insertStorePrices = async (pool) => {
+  await getItemPricePatrolBase(pool)
+  // await getItemPriceSurplusStore(pool)
+  // await getItemPriceRedwolfAirsoft(pool) 
+  // await getItemPriceZeroOneAirsoft(pool)
+  await getItemPriceAirsoftWorld(pool)
+  // await getItemPriceLandWarriorAirsoft(pool)
+  // await getItemPriceFireSupport(pool)
+  // await getItemPriceWolfArmouries(pool)
+  // await getItemPriceSkirmshop(pool)
+  // await getItemPriceBullseyeCountrySport(pool)
+
+  return ('done')
+}
+
 const getItemPrices = async () => {
   return new Promise(async function(resolve, reject) {
     const dbCreds = await getDbCreds()
     const pool = await db.getDbConnection(dbCreds)
-    await getItemPricePatrolBase(pool)
-    // await getItemPriceSurplusStore(pool)
-    await getItemPriceRedwolfAirsoft(pool) 
-    await getItemPriceZeroOneAirsoft(pool)
-    await getItemPriceAirsoftWorld(pool)
-    await getItemPriceLandWarriorAirsoft(pool)
-    await getItemPriceFireSupport(pool)
-    await getItemPriceWolfArmouries(pool)
-    await getItemPriceSkirmshop(pool)
-    await getItemPriceBullseyeCountrySport(pool)
+
+    const storePrices = await insertStorePrices(pool)
+
+    console.log(storePrices)
+    const closePool = await db.closeDbConnection(pool)
     resolve("All scraped")
   })
 }

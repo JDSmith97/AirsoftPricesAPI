@@ -30,11 +30,11 @@ const getDbConnection = (dbCreds) => {
   return poolConnection.getPoolConnection(dbCreds);
 }
 
-// const closeDbConnection = async (dbConnection, results) => {
-//   return new Promise(function(resolve, reject) {
-//     dbConnection.end(error => error ? reject(error) : resolve(results))
-//   })
-// }
+const closeDbConnection = async (pool) => {
+  return new Promise(function(resolve, reject) {
+    pool.end(error => error ? reject(error) : resolve('done'))
+  })
+}
 
 const getItems = async (pool) => {
   return new Promise(function(resolve, reject) {
@@ -136,6 +136,7 @@ const insertItemsBullseyeCountrySport = async (dbConnection, itemId, price, stoc
 
 module.exports = {
   getDbConnection,
+  closeDbConnection,
   getItems,
   insertItemsPatrolBase,
   insertItemsSurplusStore,
